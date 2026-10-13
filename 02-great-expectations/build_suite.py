@@ -7,6 +7,7 @@ Severity is our own convention for the gate in validate.py:
   critical -> the batch is unusable; stop the pipeline
   warning  -> suspicious; log it, let a human look, keep going
 """
+import json
 from pathlib import Path
 
 import great_expectations as gx
@@ -80,18 +81,38 @@ def expectations():
     yield gxe.ExpectColumnUniqueValueCountToBeBetween(column="facility_id", min_value=20, max_value=None, **warn)
 
 
+def _rules(exps):
+    """Expectation content, ignoring the random ids GX assigns on every save."""
+    return sorted(json.dumps({k: v for k, v in e.configuration.to_json_dict().items() if k != "id"},
+                             sort_keys=True) for e in exps)
+
+
 def main():
     ctx = gx.get_context(mode="file", project_root_dir=HERE)
+    new = list(expectations())
+
+    # Saving rewrites every id, which would show up as a git diff and make DVC
+    # re-run validation. Only save when the rules actually changed.
+    # (Read the stored suite BEFORE creating a new ExpectationSuite object with
+    # the same name: adding expectations to that object writes to the store.)
+    try:
+        existing = ctx.suites.get(SUITE)
+    except gx.exceptions.DataContextError:
+        existing = None  # first build
+    if existing is not None:
+        if _rules(existing.expectations) == _rules(new):
+            print(f"suite '{SUITE}' unchanged ({len(new)} expectations); nothing written")
+            return
+        ctx.suites.delete(SUITE)
+
+    suite = ctx.suites.add(gx.ExpectationSuite(name=SUITE))
+    for exp in new:
+        suite.add_expectation(exp)
 
     # Batches arrive as pandas DataFrames, so one in-memory asset serves every file
     asset = (ctx.data_sources.add_or_update_pandas("emr")
              .add_dataframe_asset("visits"))
     batch_def = asset.add_batch_definition_whole_dataframe("monthly_extract")
-
-    suite = gx.ExpectationSuite(name=SUITE)
-    for exp in expectations():
-        suite.add_expectation(exp)
-    suite = ctx.suites.add_or_update(suite)
 
     vd = ctx.validation_definitions.add_or_update(
         gx.ValidationDefinition(name="emr_monthly", data=batch_def, suite=suite))

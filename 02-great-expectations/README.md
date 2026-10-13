@@ -51,9 +51,21 @@ Read `build_suite.py`. The expectations are grouped by the question they answer:
 
 ```bash
 python build_suite.py
-#   suite 'emr_monthly_extract': 42 expectations (38 critical, 4 warning)
+#   suite 'emr_monthly_extract' unchanged (42 expectations); nothing written
 cat gx/expectations/emr_monthly_extract.json | head -40     # the suite is just JSON, in git
 ```
+The suite is already committed, so nothing is written. Change a rule in
+`build_suite.py` and rerun to see it saved; `git diff gx/` shows the change.
+
+> **GX quirks we hit while building this** (worth knowing before participants do):
+> - Every save gives each expectation a new random `id`, so re-saving an
+>   unchanged suite produces a noisy git diff (and would re-trigger DVC).
+>   `build_suite.py` compares rules first and only writes when they changed.
+> - Creating a new `gx.ExpectationSuite(name=...)` with the name of a stored
+>   suite and calling `add_expectation` on it **writes into the stored suite
+>   immediately**, even before you save. Our first version of `build_suite.py`
+>   did this and silently doubled the suite to 84 expectations. Read the stored
+>   suite first, and only then build the new one.
 
 **Where do thresholds come from?** Two sources, and say both out loud:
 domain rules (WHO plausibility limits, the programme's age range, the cohort
