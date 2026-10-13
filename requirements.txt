@@ -4,4 +4,4 @@ pandas
 scikit-learn
 pyyaml
 joblib
-great_expectations>=1.0,<2
+great_expectations>=1.8,<2   # tested: 1.8.1 and 1.24

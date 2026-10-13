@@ -10,7 +10,10 @@ stops the pipeline when it isn't met.
 > **Heads-up for the instructor:** GX 1.0 (Aug 2024) replaced the old API.
 > Most blog posts and Stack Overflow answers still show 0.x code
 > (`great_expectations init`, `ge.from_pandas`, `validator.expect_...`). None of
-> that works with this lesson. Tested with GX 1.24.
+> that works with this lesson. Tested with GX 1.8.1 and 1.24 (identical results).
+> GX 1.x minor versions still add and rename things, so check `gx.__version__`
+> when an example from the docs doesn't work. On 1.8 you'll see a harmless
+> `pyparsing` deprecation warning.
 
 Run everything from inside this `02-great-expectations/` folder.
 
@@ -30,7 +33,9 @@ Run everything from inside this `02-great-expectations/` folder.
 
 Three knobs you'll use constantly:
 - **`mostly=0.95`**: pass if at least 95% of rows comply (real data is never perfect).
-- **`row_condition=Column("age_months") >= 6`**: apply only to some rows (MUAC isn't measured under 6 months).
+- **`row_condition="age_months >= 6", condition_parser="pandas"`**: apply only to
+  some rows (MUAC isn't measured under 6 months). Recent GX also accepts
+  `row_condition=Column("age_months") >= 6`, but that fails on older 1.x releases.
 - **`severity="warning"`**: a label. **GX itself still fails the run on a
   warning**; the "block on critical, warn on warning" policy lives in our
   `validate.py`. (This surprises people, so show it.)

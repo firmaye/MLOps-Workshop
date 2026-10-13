@@ -12,7 +12,6 @@ from pathlib import Path
 
 import great_expectations as gx
 import great_expectations.expectations as gxe
-from great_expectations.expectations.row_conditions import Column
 
 HERE = Path(__file__).parent
 SUITE = "emr_monthly_extract"
@@ -25,6 +24,15 @@ COLUMNS = ["visit_id", "child_id", "visit_date", "facility_id", "region", "resid
 REGIONS = ["Addis Ababa", "Amhara", "Oromia", "SNNP", "Sidama", "Tigray", "Afar", "Somali"]
 BINARY = ["recent_diarrhea", "recent_fever", "vaccinated_for_age", "currently_breastfed",
           "prior_sam_admission", "gam_within_90d"]
+
+
+def only_if(condition):
+    """Apply an expectation only to rows matching a pandas query string.
+
+    The string form works on every GX 1.x release; the newer
+    `row_condition=Column("age_months") >= 6` syntax needs a recent GX.
+    """
+    return {"row_condition": condition, "condition_parser": "pandas"}
 
 
 def expectations():
@@ -65,8 +73,7 @@ def expectations():
     # 5. Completeness: the model needs anthropometry. `mostly` tolerates a few gaps.
     for col in ["weight_kg", "height_cm", "whz"]:
         yield gxe.ExpectColumnValuesToNotBeNull(column=col, mostly=0.95)
-    yield gxe.ExpectColumnValuesToNotBeNull(column="muac_cm", mostly=0.95,
-                                            row_condition=Column("age_months") >= 6)
+    yield gxe.ExpectColumnValuesToNotBeNull(column="muac_cm", mostly=0.95, **only_if("age_months >= 6"))
 
     # 6. Cohort definition: children already acutely malnourished should have
     #    been referred for treatment, not sent to a risk model.
@@ -74,8 +81,8 @@ def expectations():
     yield gxe.ExpectColumnMinToBeBetween(column="muac_cm", min_value=12.5, max_value=None)
 
     # 7. Warnings: plausible but worth a human look
-    yield gxe.ExpectColumnValuesToBeNull(column="muac_cm", row_condition=Column("age_months") < 6,
-                                         mostly=0.95, **warn)  # protocol: no MUAC under 6 months
+    yield gxe.ExpectColumnValuesToBeNull(column="muac_cm", mostly=0.95, **only_if("age_months < 6"),
+                                         **warn)  # protocol: no MUAC under 6 months
     yield gxe.ExpectColumnMeanToBeBetween(column="gam_within_90d", min_value=0.02, max_value=0.30, **warn)
     yield gxe.ExpectColumnMedianToBeBetween(column="age_months", min_value=6, max_value=36, **warn)
     yield gxe.ExpectColumnUniqueValueCountToBeBetween(column="facility_id", min_value=20, max_value=None, **warn)
