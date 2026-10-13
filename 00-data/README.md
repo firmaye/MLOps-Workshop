@@ -44,6 +44,7 @@ Built-in realism:
 | `muac_mm` | EMR update stores MUAC in mm (137 instead of 13.7) | data-quality bug | Great Expectations |
 | `missing_anthro` | broken scales / MUAC-only screening: 70% of weight, height, WHZ missing | pipeline change | Great Expectations, then Evidently |
 | `concept_shift` | food distribution suspended: illness and water access matter far more | concept drift | performance monitoring once labels arrive |
+| `messy_export` | several small bugs at once: Amhara MUAC in mm (and recorded for infants), "female"/"male" codes, 15 duplicate visits, children aged 60+, already-malnourished children | data-quality bugs | Great Expectations |
 
 ```bash
 python simulate_emr.py --start 2024-01 --months 12 --out data/raw            # training history

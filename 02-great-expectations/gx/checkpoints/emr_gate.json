@@ -1,0 +1,20 @@
+{
+  "actions": [
+    {
+      "name": "update_data_docs",
+      "site_names": [],
+      "type": "update_data_docs"
+    }
+  ],
+  "id": "7096c4fe-4c48-4508-a407-5d609e95a47a",
+  "name": "emr_gate",
+  "result_format": {
+    "result_format": "SUMMARY"
+  },
+  "validation_definitions": [
+    {
+      "id": "22deafe4-8f2c-4f1c-a113-ca3564a81087",
+      "name": "emr_monthly"
+    }
+  ]
+}

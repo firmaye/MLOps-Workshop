@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# lesson scratch data (regenerate with 00-data/simulate_emr.py)
+02-great-expectations/data/

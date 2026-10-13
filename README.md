@@ -8,6 +8,7 @@ EMR data.
 |---|-------|--------|
 | 0 | Mock EMR data + drift scenarios | [`00-data/`](00-data/) |
 | 1 | DVC: data, model and pipeline versioning | [`01-dvc/`](01-dvc/) |
+| 2 | Great Expectations: data validation as a pipeline gate | [`02-great-expectations/`](02-great-expectations/) |
 
 ## Setup
 ```bash

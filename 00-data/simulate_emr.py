@@ -40,6 +40,7 @@ SCENARIOS = {
     "muac_mm":        "EMR update records MUAC in millimetres instead of cm (data-quality bug).",
     "missing_anthro": "Scales broken / MUAC-only screening: weight, height, WHZ mostly missing (pipeline change).",
     "concept_shift":  "Food distribution suspended: illness and water access become far stronger risk factors (concept drift).",
+    "messy_export":   "Several small export bugs at once: one region in mm, free-text sex codes, duplicates, out-of-cohort children.",
 }
 
 # rough WHO-style medians, good enough for mock data
@@ -150,7 +151,31 @@ def simulate_month(month: pd.Period, n: int, scenario: str = "baseline", seed: i
         df.loc[gone, ["weight_kg", "height_cm", "whz"]] = np.nan
     df = df.sort_values("visit_date", kind="stable").reset_index(drop=True)
     df.insert(0, "visit_id", [f"V{month.year}{month.month:02d}-{i:05d}" for i in range(len(df))])
+    if scenario == "messy_export":
+        df = _make_messy(df, rng)
     return df
+
+
+def _make_messy(df: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
+    """Several small, realistic export problems at once (each affects a minority of rows)."""
+    df = df.copy()
+    # Amhara facilities got a new EMR version first: MUAC in mm, and recorded for infants too
+    amhara = df["region"] == "Amhara"
+    infants = amhara & (df["age_months"] < 6)
+    df.loc[infants, "muac_cm"] = rng.normal(12.5, 0.6, infants.sum()).round(1)
+    df.loc[amhara, "muac_cm"] = (df.loc[amhara, "muac_cm"] * 10).round(0)
+    # free-text sex codes from one data clerk
+    clerk = rng.choice(df.index, size=40, replace=False)
+    df.loc[clerk, "sex"] = df.loc[clerk, "sex"].map({"F": "female", "M": "male"})
+    # children who aged out of the 0-59 month programme
+    aged_out = rng.choice(df.index, size=12, replace=False)
+    df.loc[aged_out, "age_months"] = rng.integers(60, 72, size=12)
+    # already-malnourished children who should have been referred, not scored
+    referred = rng.choice(df.index, size=25, replace=False)
+    df.loc[referred, "whz"] = rng.uniform(-3.0, -2.1, size=25).round(2)
+    # a re-run of part of the export appends duplicate visits
+    dupes = df.sample(n=15, random_state=int(rng.integers(1_000_000)))
+    return pd.concat([df, dupes], ignore_index=True)
 
 
 def main():
