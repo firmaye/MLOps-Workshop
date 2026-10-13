@@ -12,9 +12,9 @@ EMR data.
 
 ## Setup
 
-**Python 3.10+ required; 3.12 recommended.** macOS ships Python 3.9, which
-gets old versions of these tools (or none). The lessons were verified with
-Python 3.12/3.13, DVC 3.67, scikit-learn 1.9, pandas 3.0, and GX 1.24.
+**Python 3.12.** (3.10+ works with `requirements.txt`, but the lock file and
+all numbers in the READMEs were verified on 3.12.) macOS ships Python 3.9,
+which is too old.
 
 Easiest: [uv](https://docs.astral.sh/uv/) installs Python and packages, and is fast:
 ```bash
@@ -22,13 +22,27 @@ curl -LsSf https://astral.sh/uv/install.sh | sh     # Windows: see the uv docs
 uv python install 3.12
 uv venv --python 3.12 .venv
 source .venv/bin/activate                           # Windows: .venv\Scripts\activate
-uv pip install -r requirements.txt
+uv pip sync requirements.lock
 ```
 
 Or with a Python 3.12 you already have:
 ```bash
 python3.12 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.lock
 ```
 
 Check: `python --version && dvc --version && python -c "import great_expectations as gx; print(gx.__version__)"`
+(expect 3.12.x, 3.67.1, 1.24.0).
+
+### Two requirements files
+- `requirements.txt`: what the project depends on directly, loosely pinned. Edit this one.
+- `requirements.lock`: every package, including dependencies of dependencies,
+  pinned to the exact versions the lessons were verified with, for macOS,
+  Windows and Linux. Install from this one.
+
+After changing `requirements.txt`, regenerate the lock and re-verify the lessons:
+```bash
+uv pip compile requirements.txt --universal --python-version 3.12 -o requirements.lock
+```
+Same idea as DVC: `dvc.lock` pins the data and outputs, `requirements.lock`
+pins the environment. Reproducibility needs both.
