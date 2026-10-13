@@ -12,6 +12,34 @@ EMR data.
 
 ## Setup
 
+### 1. Get your own copy of the repo
+
+1. On GitHub, click **Fork** on this repo: you get `github.com/<you>/MLOps-Workshop`.
+2. Clone **your fork** and connect it to the original, so you can pull lesson updates:
+```bash
+mkdir mlops && cd mlops          # the DVC lesson creates ../dvc-remote next to the clone
+git clone https://github.com/<you>/MLOps-Workshop.git
+cd MLOps-Workshop
+git remote add upstream https://github.com/ydfriedman/MLOps-Workshop.git
+git checkout -b work             # do the lessons on this branch; keep `main` = the lessons as published
+```
+- `origin` = your fork (you push here). `upstream` = the workshop repo (you only pull from it).
+- **Getting lesson updates** during the workshop:
+  ```bash
+  git checkout main && git pull upstream main     # main = latest lessons
+  git checkout work && git merge main             # bring them into your work branch
+  ```
+- **Starting over** (throws away everything on `work`, including DVC data and models):
+  ```bash
+  git checkout -f main             # -f: discard uncommitted changes
+  git branch -D work
+  git clean -fdx -e .venv          # delete untracked + ignored files (DVC cache, data, models); keep .venv
+  rm -rf ../dvc-remote             # the DVC lesson's local remote
+  git checkout -b work
+  ```
+
+### 2. Python environment
+
 **Python 3.12.** (3.10+ works with `requirements.txt`, but the lock file and
 all numbers in the READMEs were verified on 3.12.) macOS ships Python 3.9,
 which is too old.

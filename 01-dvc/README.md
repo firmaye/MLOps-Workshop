@@ -7,7 +7,9 @@ can prioritise follow-up. The data is synthetic, from `../00-data/simulate_emr.p
 (see [`00-data/README.md`](../00-data/README.md); to *look* at the data first,
 open [`00-data/explore_data.ipynb`](../00-data/explore_data.ipynb)).
 
-Run everything from inside this `01-dvc/` folder. Numbers shown are from a
+Before starting, follow the setup in the [main README](../README.md): your own
+fork, and a `work` branch. Run everything from inside this `01-dvc/` folder.
+Numbers shown are from a
 verified run; yours should match exactly (the simulator is deterministic).
 Every command used here is also listed in [`DVC_CHEATSHEET.md`](DVC_CHEATSHEET.md).
 
@@ -147,12 +149,14 @@ sensitivity by region: {'Addis Ababa': 0.0714, 'Afar': 0.5957, ...}
 
 Now save this state:
 ```bash
-git add dvc.lock .gitignore metrics.json metrics_by_group.json plots
+git status --short                 # what repro changed: dvc.lock, metrics, plots, and two .gitignore
+                                   #   files (DVC gitignores its outputs: model.pkl, data/processed)
+git add dvc.lock .gitignore data/.gitignore metrics.json metrics_by_group.json plots
 git commit -m "Baseline model"     # dvc.lock = exact hashes of every input and output of this run
+git status --short                 # empty = everything committed (needed before switching versions)
 git tag v1                         # give this commit a permanent, human-readable name
 dvc push                           # upload the new outputs (processed data, model.pkl)
-# In a real project you'd now also `git push`. Don't here: your clone's remote is the
-# workshop repo itself, and you'd publish your practice commits to everyone.
+git push -u origin work --tags     # upload code + pointers (+ tags) to YOUR fork on GitHub
 dvc repro                          # nothing changed -> "Data and pipelines are up to date."
 ```
 
@@ -251,7 +255,7 @@ dvc queue start -j 2                       # run the queue, 2 at a time
 dvc queue status                           # wait until all show Success
 dvc exp show --only-changed --sort-by roc_auc --sort-order desc   # compare all runs as a table
 ```
-Logistic regression (`main`, 0.812) still beats every gbm variant (0.802–0.808).
+Logistic regression (your `work` branch, 0.812) still beats every gbm variant (0.802–0.808).
 
 **Promoting an experiment** = turning the one you chose into a normal commit:
 ```bash
@@ -280,7 +284,7 @@ dvc checkout                       # data, processed files, model.pkl as they we
 ls data/raw | wc -l                # 6 months: Jan-Jun 2024
 cat metrics.json                   # how it scored at the time
 cat params.yaml                    # how it was configured
-git checkout main && dvc checkout  # back to the present
+git checkout - && dvc checkout     # back to the present (`-` = the branch you were on)
 ls data/raw | wc -l                # 12 months
 ```
 If the data was pushed, a colleague with a fresh clone can do the same thing
