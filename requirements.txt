@@ -4,4 +4,6 @@ pandas
 scikit-learn
 pyyaml
 joblib
+matplotlib        # notebooks
+ipykernel         # lets VSCode/Jupyter run the notebooks
 great_expectations>=1.8,<2   # tested: 1.8.1 and 1.24

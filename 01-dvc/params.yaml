@@ -1,12 +1,15 @@
+# Settings read by the pipeline scripts. DVC tracks each section listed under
+# `params:` in dvc.yaml: change a value and only the stages using it rerun.
+
 prepare:
   test_months: 2        # most recent N months held out as the test set
 
 train:
-  model: logistic       # logistic | gbm
-  C: 1.0                # logistic regularisation
-  max_depth: 3          # gbm only
-  learning_rate: 0.1    # gbm only
-  n_estimators: 200     # gbm only
+  model: logistic       # logistic | gbm (gradient-boosted trees)
+  C: 1.0                # logistic only: regularisation strength (smaller = simpler model)
+  max_depth: 3          # gbm only: depth of each tree
+  learning_rate: 0.1    # gbm only: how much each tree corrects the previous ones
+  n_estimators: 200     # gbm only: number of trees
 
 evaluate:
-  alert_rate: 0.2       # share of children the clinic can follow up
+  alert_rate: 0.2       # share of visits the clinic can follow up (top 20% by risk are flagged)

@@ -24,6 +24,10 @@ antlr4-python3-runtime==4.9.3
     #   omegaconf
 appdirs==1.4.4
     # via iterative-telemetry
+appnope==1.0.0 ; sys_platform == 'darwin'
+    # via ipykernel
+asttokens==3.0.2
+    # via stack-data
 asyncssh==2.24.1
     # via scmrepo
 atpublic==9.0.0
@@ -48,6 +52,7 @@ cffi==2.1.1
     # via
     #   cryptography
     #   pygit2
+    #   pyzmq
 charset-normalizer==3.5.2
     # via requests
 click==8.5.0
@@ -68,13 +73,22 @@ cloudpickle==3.1.2
 colorama==0.4.6
     # via
     #   dvc
+    #   ipython
     #   tqdm
+comm==0.2.3
+    # via ipykernel
 configobj==5.0.9
     # via dvc
+contourpy==1.4.0
+    # via matplotlib
 cryptography==50.0.2
     # via
     #   asyncssh
     #   great-expectations
+cycler==0.12.1
+    # via matplotlib
+debugpy==1.8.22
+    # via ipykernel
 dictdiffer==0.10.0
     # via dvc-data
 diskcache==5.6.3
@@ -108,12 +122,16 @@ dvc-task==0.40.2
     # via dvc
 entrypoints==0.4
     # via gto
+executing==2.3.0
+    # via stack-data
 filelock==4.1.1
     # via iterative-telemetry
 flatten-dict==0.5.0
     # via dvc
 flufl-lock==9.2.0
     # via dvc
+fonttools==4.66.1
+    # via matplotlib
 frozenlist==1.8.0
     # via
     #   aiohttp
@@ -146,8 +164,16 @@ idna==3.20
     # via
     #   requests
     #   yarl
+ipykernel==7.4.0
+    # via -r requirements.txt
+ipython==9.17.1
+    # via ipykernel
+ipython-pygments-lexers==1.1.1
+    # via ipython
 iterative-telemetry==0.0.10
     # via dvc
+jedi==0.20.1
+    # via ipython
 jinja2==3.1.6
     # via
     #   altair
@@ -162,6 +188,14 @@ jsonschema==4.26.0
     #   great-expectations
 jsonschema-specifications==2025.9.1
     # via jsonschema
+jupyter-client==8.10.0
+    # via ipykernel
+jupyter-core==5.9.1
+    # via
+    #   ipykernel
+    #   jupyter-client
+kiwisolver==1.5.1
+    # via matplotlib
 kombu==5.6.2
     # via
     #   celery
@@ -173,6 +207,12 @@ markupsafe==3.0.4
     # via jinja2
 marshmallow==4.3.1
     # via great-expectations
+matplotlib==3.11.2
+    # via -r requirements.txt
+matplotlib-inline==0.2.2
+    # via
+    #   ipykernel
+    #   ipython
 mdurl==0.1.2
     # via markdown-it-py
 mistune==3.3.4
@@ -185,12 +225,16 @@ narwhals==2.27.1
     # via
     #   altair
     #   scikit-learn
+nest-asyncio2==1.7.4
+    # via ipykernel
 networkx==3.7
     # via dvc
 numpy==2.5.4
     # via
     #   -r requirements.txt
+    #   contourpy
     #   great-expectations
+    #   matplotlib
     #   pandas
     #   scikit-learn
     #   scipy
@@ -208,19 +252,31 @@ packaging==26.3
     #   dvc
     #   great-expectations
     #   hydra-core
+    #   ipykernel
     #   kombu
+    #   matplotlib
 pandas==3.0.6
     # via
     #   -r requirements.txt
     #   great-expectations
+parso==0.8.7
+    # via jedi
 pathspec==1.1.1
     # via
     #   dvc
     #   scmrepo
+pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
+    # via ipython
+pillow==12.3.0
+    # via matplotlib
 platformdirs==4.13.0
-    # via dvc
+    # via
+    #   dvc
+    #   jupyter-core
 prompt-toolkit==3.0.53
-    # via click-repl
+    # via
+    #   click-repl
+    #   ipython
 propcache==0.5.4
     # via
     #   aiohttp
@@ -229,6 +285,11 @@ psutil==7.2.2
     # via
     #   dvc
     #   flufl-lock
+    #   ipython
+ptyprocess==0.7.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
+    # via pexpect
+pure-eval==0.2.4
+    # via stack-data
 pycparser==3.11 ; implementation_name != 'PyPy'
     # via cffi
 pydantic==2.14.1
@@ -245,7 +306,10 @@ pydot==4.0.1
 pygit2==1.20.1
     # via scmrepo
 pygments==2.21.0
-    # via rich
+    # via
+    #   ipython
+    #   ipython-pygments-lexers
+    #   rich
 pygtrie==2.6.2
     # via
     #   dvc
@@ -257,11 +321,14 @@ pyparsing==3.3.3
     #   dvc
     #   grandalf
     #   great-expectations
+    #   matplotlib
     #   pydot
 python-dateutil==2.9.0.post0
     # via
     #   celery
     #   great-expectations
+    #   jupyter-client
+    #   matplotlib
     #   pandas
 python-dotenv==1.2.4
     # via pydantic-settings
@@ -271,6 +338,10 @@ pyyaml==6.0.3
     # via
     #   -r requirements.txt
     #   omegaconf
+pyzmq==27.2.0
+    # via
+    #   ipykernel
+    #   jupyter-client
 referencing==0.37.0
     # via
     #   jsonschema
@@ -320,6 +391,8 @@ smmap==5.0.3
     # via gitdb
 sqltrie==0.11.3
     # via dvc-data
+stack-data==0.6.3
+    # via ipython
 tabulate==0.10.0
     # via
     #   dvc
@@ -328,6 +401,10 @@ threadpoolctl==3.7.0
     # via scikit-learn
 tomlkit==0.15.1
     # via dvc
+tornado==6.5.10
+    # via
+    #   ipykernel
+    #   jupyter-client
 tqdm==4.70.1
     # via
     #   dvc
@@ -335,6 +412,13 @@ tqdm==4.70.1
     #   fsspec
     #   great-expectations
     #   scmrepo
+traitlets==5.16.1
+    # via
+    #   ipykernel
+    #   ipython
+    #   jupyter-client
+    #   jupyter-core
+    #   matplotlib-inline
 typing-extensions==4.16.0
     # via
     #   aiohttp
@@ -343,6 +427,7 @@ typing-extensions==4.16.0
     #   asyncssh
     #   click-repl
     #   great-expectations
+    #   jupyter-client
     #   pydantic
     #   pydantic-core
     #   referencing

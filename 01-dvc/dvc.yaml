@@ -1,12 +1,15 @@
+# The pipeline: three stages, each = a command + what it reads (deps, params) + what it writes (outs).
+# DVC hashes every dep/param; `dvc repro` reruns a stage only if one of them changed,
+# and then everything downstream of it. Exact hashes of the last run are in dvc.lock.
 stages:
   prepare:
     cmd: python src/prepare.py
-    deps:
+    deps:                       # files this stage reads
       - src/prepare.py
       - data/raw
-    params:
+    params:                     # sections of params.yaml this stage reads
       - prepare
-    outs:
+    outs:                       # files it writes: cached by DVC, gitignored, pushed with `dvc push`
       - data/processed
 
   train:
@@ -30,12 +33,12 @@ stages:
     params:
       - evaluate
     outs:
-      - metrics_by_group.json:   # per-group detail: a plain output, so `dvc exp show` stays readable
-          cache: false
-    metrics:
+      - metrics_by_group.json:  # per-group detail: a plain output, so `dvc exp show` stays readable
+          cache: false          # cache: false = small file, kept in git instead of the DVC cache
+    metrics:                    # numbers `dvc metrics diff/show` and `dvc exp show` compare
       - metrics.json:
           cache: false
-    plots:
+    plots:                      # curves for `dvc plots show/diff`
       - plots/roc.csv:
           cache: false
           x: fpr

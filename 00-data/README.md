@@ -4,6 +4,11 @@
 **All data is synthetic.** Effect directions are loosely based on published
 Ethiopian DHS analyses; the numbers are invented.
 
+**Start here:** open [`explore_data.ipynb`](explore_data.ipynb) in VSCode (select
+the `.venv` kernel) and run it top to bottom. It looks at the outcome rate by
+month/region/age/sex, the MUAC vs WHZ difference between girls and boys, and what
+each drift scenario looks like next to normal data.
+
 ## The prediction task
 
 - **Cohort:** visits by children aged 0–59 months who are *not* currently
