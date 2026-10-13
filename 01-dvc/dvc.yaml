@@ -3,27 +3,44 @@ stages:
     cmd: python src/prepare.py
     deps:
       - src/prepare.py
-      - data/raw.csv
+      - data/raw
     params:
       - prepare
     outs:
-      - data/train.csv
-      - data/test.csv
+      - data/processed
+
   train:
     cmd: python src/train.py
     deps:
       - src/train.py
-      - data/train.csv
+      - src/features.py
+      - data/processed/train.csv
     params:
       - train
     outs:
       - model.pkl
+
   evaluate:
     cmd: python src/evaluate.py
     deps:
       - src/evaluate.py
+      - src/features.py
       - model.pkl
-      - data/test.csv
+      - data/processed/test.csv
+    params:
+      - evaluate
+    outs:
+      - metrics_by_group.json:   # per-group detail: a plain output, so `dvc exp show` stays readable
+          cache: false
     metrics:
       - metrics.json:
           cache: false
+    plots:
+      - plots/roc.csv:
+          cache: false
+          x: fpr
+          y: tpr
+      - plots/pr.csv:
+          cache: false
+          x: recall
+          y: precision

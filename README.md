@@ -1,13 +1,16 @@
 # MLOps Workshop
 
-Hands-on mini-projects, one per tool.
+Hands-on lessons, one per tool, built around one running example: predicting
+which children are at risk of acute malnutrition from (synthetic) Ethiopian
+EMR data.
 
-| # | Tool | Folder |
-|---|------|--------|
-| 1 | DVC (data + pipeline versioning) | [`01-dvc/`](01-dvc/) |
+| # | Topic | Folder |
+|---|-------|--------|
+| 0 | Mock EMR data + drift scenarios | [`00-data/`](00-data/) |
+| 1 | DVC: data, model and pipeline versioning | [`01-dvc/`](01-dvc/) |
 
 ## Setup
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r 01-dvc/requirements.txt
+pip install -r requirements.txt
 ```

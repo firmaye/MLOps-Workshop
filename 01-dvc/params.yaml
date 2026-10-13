@@ -1,6 +1,12 @@
 prepare:
-  test_size: 0.2
-  seed: 42
+  test_months: 2        # most recent N months held out as the test set
+
 train:
-  n_estimators: 50
-  max_depth: 3
+  model: logistic       # logistic | gbm
+  C: 1.0                # logistic regularisation
+  max_depth: 3          # gbm only
+  learning_rate: 0.1    # gbm only
+  n_estimators: 200     # gbm only
+
+evaluate:
+  alert_rate: 0.2       # share of children the clinic can follow up

@@ -1,0 +1,6 @@
+dvc>=3.50
+numpy
+pandas
+scikit-learn
+pyyaml
+joblib
