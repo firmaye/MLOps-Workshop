@@ -11,6 +11,7 @@ EMR data.
 | 2 | Great Expectations: data validation as a pipeline gate | [`02-great-expectations/`](02-great-expectations/) |
 | 3 | MLflow: experiment tracking, model registry, serving | [`03-mlflow/`](03-mlflow/) |
 | 4 | Fairlearn: who does the model miss? Per-group metrics, causes, mitigation | [`04-fairlearn/`](04-fairlearn/) |
+| 5 | Evidently: data drift, prediction drift, performance monitoring | [`05-evidently/`](05-evidently/) |
 
 ## Where each tool runs: training vs production, centre vs edge
 

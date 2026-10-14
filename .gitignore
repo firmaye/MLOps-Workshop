@@ -8,6 +8,8 @@ venv/
 00-data/data/
 03-mlflow/data/
 04-fairlearn/data/
+05-evidently/data/
+05-evidently/reports/
 # MLflow's local store: created wherever MLflow runs (always 03-mlflow/ in this lesson)
 mlflow.db
 mlruns/
