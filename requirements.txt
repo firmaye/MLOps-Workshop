@@ -10,3 +10,4 @@ great_expectations>=1.8,<2   # tested: 1.8.1 and 1.24
 mlflow>=3,<4                 # tested: 3.17
 fairlearn>=0.13               # tested: 0.15
 evidently>=0.7,<0.8          # tested: 0.7.23 (the 0.7 API differs from older tutorials)
+prefect>=3,<4                # tested: 3.8

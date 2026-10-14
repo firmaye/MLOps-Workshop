@@ -10,6 +10,10 @@ venv/
 04-fairlearn/data/
 05-evidently/data/
 05-evidently/reports/
+06-prefect/data/incoming/
+06-prefect/data/quarantine/
+06-prefect/data/predictions/
+06-prefect/reports/
 # MLflow's local store: created wherever MLflow runs (always 03-mlflow/ in this lesson)
 mlflow.db
 mlruns/
