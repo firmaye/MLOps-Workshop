@@ -11,6 +11,38 @@ EMR data.
 | 2 | Great Expectations: data validation as a pipeline gate | [`02-great-expectations/`](02-great-expectations/) |
 | 3 | MLflow: experiment tracking, model registry, serving | [`03-mlflow/`](03-mlflow/) |
 
+## Where each tool runs: training vs production, centre vs edge
+
+The MLOps tools in this workshop live **where models are built and managed**. They are
+not installed where predictions happen at the point of care.
+
+| Tool | Training / retraining (central) | Production, central (server, batch scoring) | Production, edge (offline tablet / health post) |
+|---|---|---|---|
+| **DVC** | versions training + evaluation data, pipeline, model files | versions production data **once it syncs back** and becomes next round's training data | – |
+| **Great Expectations** | gate on every training extract | gate on every scoring batch (a scoring suite: no label column) | – the tool stays central; its **per-record** rules become a small input check or form validation |
+| **MLflow tracking** | every training run: params, metrics, data + code version | optional: monitoring metrics over time | – |
+| **MLflow registry** | approve a version (`@champion`), with evidence | source of truth for which model to load | indirectly: the exported bundle records which registry version it is |
+| **MLflow serving** | – | one option for an API (or your own API, or batch scoring) | – |
+| **Fairlearn** | per-group evaluation before promotion | per-group performance once outcomes arrive | – |
+| **Evidently** | defines the reference data | drift reports on synced production data | – |
+| **Prefect** | orchestrates retraining | schedules batch scoring, monitoring, syncs | – |
+| **Labeling (e.g. Label Studio)** | creates labels (images, audio, text) | reviews uncertain or flagged cases → new labels | – |
+
+**What runs at the edge** is small: the **approved model** (a model file, or for a logistic
+regression even a points score), an **input check** for single records, and **logging**
+of inputs, predictions and the model version for later sync.
+
+**What crosses the boundary:**
+- *centre → edge:* model bundle = model (or points table) + input rules + registry version
+- *edge → centre:* inputs, predictions, model version used; later, the outcomes
+
+**Two kinds of data checks:** *per-record* rules (MUAC 8–25 cm, sex F/M, age 0–59 months,
+required fields) can run anywhere, including on the device or in the data-entry form.
+*Batch* rules (duplicates, row counts, outcome rate, number of facilities) need many
+records, so they run centrally on synced data. Keep one rules file that generates both,
+so edge and centre never disagree. At the edge, a failed check should explain why there's
+no risk score and fall back to the standard clinical rule (MUAC cut-offs), not fail silently.
+
 ## Setup
 
 ### 1. Get your own copy of the repo
