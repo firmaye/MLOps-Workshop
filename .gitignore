@@ -7,6 +7,7 @@ venv/
 02-great-expectations/data/
 00-data/data/
 03-mlflow/data/
+04-fairlearn/data/
 # MLflow's local store: created wherever MLflow runs (always 03-mlflow/ in this lesson)
 mlflow.db
 mlruns/

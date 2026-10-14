@@ -10,6 +10,7 @@ EMR data.
 | 1 | DVC: data, model and pipeline versioning ([cheat sheet](01-dvc/DVC_CHEATSHEET.md)) | [`01-dvc/`](01-dvc/) |
 | 2 | Great Expectations: data validation as a pipeline gate | [`02-great-expectations/`](02-great-expectations/) |
 | 3 | MLflow: experiment tracking, model registry, serving | [`03-mlflow/`](03-mlflow/) |
+| 4 | Fairlearn: who does the model miss? Per-group metrics, causes, mitigation | [`04-fairlearn/`](04-fairlearn/) |
 
 ## Where each tool runs: training vs production, centre vs edge
 

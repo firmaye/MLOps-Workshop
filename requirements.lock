@@ -152,6 +152,8 @@ entrypoints==0.4
     # via gto
 executing==2.3.0
     # via stack-data
+fairlearn==0.15.0
+    # via -r requirements.txt
 fastapi==0.143.0
     # via mlflow-skinny
 filelock==4.1.1
@@ -298,6 +300,7 @@ multidict==7.1.0
 narwhals==2.27.1
     # via
     #   altair
+    #   fairlearn
     #   scikit-learn
 nest-asyncio2==1.7.4
     # via ipykernel
@@ -307,6 +310,7 @@ numpy==2.5.4
     # via
     #   -r requirements.txt
     #   contourpy
+    #   fairlearn
     #   great-expectations
     #   matplotlib
     #   mlflow
@@ -354,6 +358,7 @@ packaging==26.3
 pandas==3.0.6
     # via
     #   -r requirements.txt
+    #   fairlearn
     #   great-expectations
     #   mlflow
 parso==0.8.7
@@ -491,10 +496,12 @@ ruamel-yaml==0.19.1
 scikit-learn==1.9.1
     # via
     #   -r requirements.txt
+    #   fairlearn
     #   mlflow
     #   skops
 scipy==1.18.1
     # via
+    #   fairlearn
     #   great-expectations
     #   mlflow
     #   scikit-learn
