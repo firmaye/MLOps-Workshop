@@ -9,6 +9,7 @@ EMR data.
 | 0 | Mock EMR data + drift scenarios; [notebook](00-data/explore_data.ipynb) to explore it | [`00-data/`](00-data/) |
 | 1 | DVC: data, model and pipeline versioning ([cheat sheet](01-dvc/DVC_CHEATSHEET.md)) | [`01-dvc/`](01-dvc/) |
 | 2 | Great Expectations: data validation as a pipeline gate | [`02-great-expectations/`](02-great-expectations/) |
+| 3 | MLflow: experiment tracking, model registry, serving | [`03-mlflow/`](03-mlflow/) |
 
 ## Setup
 
@@ -48,7 +49,7 @@ Easiest: [uv](https://docs.astral.sh/uv/) installs Python and packages, and is f
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh     # Windows: see the uv docs
 uv python install 3.12
-uv venv --python 3.12 .venv
+uv venv --python 3.12 --seed .venv                  # --seed: include pip (MLflow warns without it)
 source .venv/bin/activate                           # Windows: .venv\Scripts\activate
 uv pip sync requirements.lock
 ```
