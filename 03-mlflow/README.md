@@ -25,6 +25,8 @@ runs + models, and each MLflow run records the DVC data hash.
 
 ---
 
+Every MLflow call and command used here, explained: [`MLFLOW_CHEATSHEET.md`](MLFLOW_CHEATSHEET.md).
+
 ## Setup
 
 From the repo root, activate the environment and move into this folder (MLflow
@@ -101,6 +103,47 @@ curl -s -X POST http://127.0.0.1:5001/invocations -H "Content-Type: application/
 `--env-manager local` uses your current environment; without it MLflow tries to build
 a fresh one from the model's saved requirements (slow, needs internet).
 
+## Should we actually serve with MLflow?
+
+`mlflow models serve` is a quick, honest way to show "a registered model becomes an API",
+and fine for internal tools and pilots. For production, teams usually choose one of:
+
+| Option | When it fits |
+|---|---|
+| `mlflow models serve` / `mlflow models build-docker` | internal service, the team already runs MLflow; the image includes MLflow (large) |
+| Your own small API (e.g. FastAPI) that loads the model file | you want a small, controlled service; common in practice |
+| **Batch scoring** (a scheduled job scores each new extract, writes risks back to the EMR/DHIS2) | the clinic doesn't need an instant answer; often the right fit for monthly malnutrition risk |
+| Embed in the client app (on-device) | offline use; see below |
+
+In the workshop: show serving, then ask which of these fits the ministry's setup.
+
+## Central MLOps, light deployments
+
+MLflow, DVC and Great Expectations are **training-side** tools: they belong where models
+are built, compared and approved (a ministry server, a cloud project). They don't need to
+be where predictions happen, and usually shouldn't be: a tablet in a health post offline
+for days can't run an MLflow server.
+
+The usual split:
+- **Centre:** data versioning (DVC), validation (GX), tracking + registry (MLflow),
+  monitoring (Evidently), orchestration (Prefect). Heavy tools, good connectivity.
+- **Edge:** only the *approved model*, exported from the registry, plus a tiny check of its
+  inputs. Options, lightest first:
+  - **A points score.** A logistic regression is a weighted sum. Its coefficients can be
+    turned into a simple score (e.g. +3 for recent diarrhoea, +2 for >60 min to water) that
+    runs inside any EMR form, on any phone, even on paper. Many clinical risk tools work
+    this way, and it's very explainable.
+  - **A model file + a small script** (scikit-learn/skops, or ONNX for a tiny runtime with
+    no scikit-learn). No MLflow needed to *use* a model, only to manage it.
+  - **A container** with the model and a small API, where a local server exists.
+- **Back to the centre:** predictions and later outcomes sync back when connectivity
+  returns, so drift and performance are still monitored centrally.
+
+So yes, caveat the training: *these tools manage the lifecycle centrally; what runs at the
+point of care depends on the deployment context.* Distribute the model and a minimal
+input check, not the MLOps stack. Worth asking the ministry: where would predictions run
+(central batch, district server, eCHIS tablets), and how often do devices sync?
+
 ## Gotchas we hit building this (MLflow 3.17)
 
 - **"Untrusted types" when logging a model.** MLflow 3 saves scikit-learn models with
@@ -110,10 +153,12 @@ a fresh one from the model's saved requirements (slow, needs internet).
 - **Loaded model returns 0/1 instead of a risk.** By default the generic (pyfunc) model
   calls `.predict()`. We log with `pyfunc_predict_fn="predict_proba"`, so predictions are
   `[P(0), P(1)]` pairs; column 1 is the risk.
-- **The signature is a contract.** The model checks column names and types on every
-  call (a missing column is rejected). Integer columns must stay integers; casting them
-  to float in the signature made MLflow reject normal integer input. Great Expectations
-  guarantees those columns are never empty, so the two tools back each other up.
+- **The signature checks shape, not meaning.** It blocks missing columns and wrong types
+  (and, as a side effect of types, a missing value in an integer column). It accepts an
+  unknown code (`sex="female"`, silently ignored) and **MUAC in millimetres, which drives
+  every child's risk to ~0**. Notebook 2 demonstrates this. Great Expectations is the real
+  data check; the signature is the model's last line of defence. Also: integer columns must
+  stay integers in the signature; casting them to float made MLflow reject normal input.
 - **Runs "disappear".** You started `mlflow ui` from a different folder, so it opened a
   different (empty) `mlflow.db`. Start it from `03-mlflow/`.
 - **Start over:** stop the UI, delete `mlflow.db` and `mlruns/` in this folder.

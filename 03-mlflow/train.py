@@ -16,6 +16,9 @@ from mlflow.models import infer_signature
 import emr_model as em
 
 EXPERIMENT = "gam-risk"
+# Name each logged model by its algorithm, so the Models list is readable.
+# (The *registered* model, "gam-risk", is a separate name: see 2_registry.ipynb.)
+MODEL_NAMES = {"logistic": "logistic-regression", "gbm": "gradient-boosting"}
 
 # Two harmless MLflow warnings that would otherwise appear on every run:
 warnings.filterwarnings("ignore", message=".*Inferred schema contains integer column.*")
@@ -56,7 +59,7 @@ def train_and_log(model="logistic", C=1.0, max_depth=3, learning_rate=0.1, n_est
         mlflow.log_input(mlflow.data.from_pandas(train, source=str(em.RAW), name="emr_train",
                                                  targets=em.LABEL), context="training")
         info = mlflow.sklearn.log_model(                                     # the model itself
-            fitted, name="model",
+            fitted, name=MODEL_NAMES[model],
             # the input "contract": column names and types, checked on every prediction
             signature=infer_signature(test[em.FEATURES], fitted.predict_proba(test[em.FEATURES])),
             input_example=test[em.FEATURES].head(3),
