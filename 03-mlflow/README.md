@@ -40,6 +40,11 @@ mlflow ui --port 5000               # leave running; open http://127.0.0.1:5000
 To make the opt-out permanent, add the `export` line to your shell profile (`~/.zshrc`
 on macOS). The notebooks turn it off themselves in their first cell.
 
+**In the UI, switch the toggle at the top left from *GenAI* to *Model training*.**
+MLflow 3 opens in GenAI mode (LLM traces), which shows none of our runs. In *Model
+training* mode the left menu has **Runs**, **Models** (logged models) and **Model
+registry**. The *MLflow Assistant* panel on the right is optional; close it with ✕.
+
 Then open the notebooks in VSCode (kernel: `.venv`) and run them in order:
 1. **`1_tracking.ipynb`**: log one run by hand, then a grid of runs; compare them in
    the UI and with `mlflow.search_runs`; see what autolog does and doesn't capture.
