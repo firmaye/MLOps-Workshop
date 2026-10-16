@@ -6,6 +6,8 @@ aiohttp==3.14.5
     # via
     #   aiohttp-retry
     #   fsspec
+    #   instructor
+    #   langchain-community
     #   mlflow
 aiohttp-retry==2.9.1
     # via
@@ -39,6 +41,7 @@ anyio==4.15.1
     # via
     #   httpx
     #   httpx2
+    #   langsmith
     #   litestar
     #   mlflow-skinny
     #   openai
@@ -46,7 +49,9 @@ anyio==4.15.1
     #   starlette
     #   watchfiles
 appdirs==1.4.4
-    # via iterative-telemetry
+    # via
+    #   iterative-telemetry
+    #   ragas
 appnope==1.0.0 ; sys_platform == 'darwin'
     # via ipykernel
 apprise==1.13.1
@@ -94,6 +99,7 @@ certifi==2026.7.22
     #   evidently
     #   httpcore
     #   httpx
+    #   langchain-openai
     #   requests
 cffi==2.1.1
     # via
@@ -111,6 +117,8 @@ click==8.5.0
     #   click-repl
     #   flask
     #   gto
+    #   huggingface-hub
+    #   instructor
     #   litestar
     #   mlflow-skinny
     #   nltk
@@ -166,6 +174,10 @@ databricks-sdk==0.152.0
     # via
     #   mlflow-skinny
     #   mlflow-tracing
+dataclasses-json==0.6.7
+    # via langchain-community
+datasets==5.1.0
+    # via ragas
 dateparser==1.4.3
     # via prefect
 debugpy==1.8.22
@@ -176,18 +188,28 @@ deprecation==2.1.0
     # via evidently
 dictdiffer==0.10.0
     # via dvc-data
+dill==0.4.1
+    # via
+    #   datasets
+    #   multiprocess
 diskcache==5.6.3
-    # via dvc-data
+    # via
+    #   dvc-data
+    #   ragas
 distro==1.9.0
     # via
     #   dvc
     #   iterative-telemetry
+    #   langsmith
+    #   openai
 docker==7.2.0
     # via
     #   mlflow
     #   prefect
 docstring-parser==0.18.0
-    # via cyclopts
+    # via
+    #   cyclopts
+    #   instructor
 dpath==2.2.0
     # via dvc
 dulwich==1.2.17
@@ -230,7 +252,10 @@ fastapi==0.143.0
     #   mlflow-skinny
     #   prefect
 filelock==4.1.1
-    # via iterative-telemetry
+    # via
+    #   datasets
+    #   huggingface-hub
+    #   iterative-telemetry
 flask==3.1.3
     # via
     #   flask-cors
@@ -251,13 +276,15 @@ frozenlist==1.8.0
     # via
     #   aiohttp
     #   aiosignal
-fsspec==2026.9.0
+fsspec==2026.7.0
     # via
+    #   datasets
     #   dvc
     #   dvc-data
     #   dvc-http
     #   dvc-objects
     #   evidently
+    #   huggingface-hub
     #   prefect
     #   scmrepo
 funcy==2.1
@@ -308,6 +335,8 @@ h11==0.16.0
     #   uvicorn
 h2==4.4.1
     # via httpx
+hf-xet==1.7.0 ; platform_machine == 'AMD64' or platform_machine == 'ARM64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'
+    # via huggingface-hub
 hpack==4.2.0
     # via h2
 httpcore==1.0.9
@@ -320,14 +349,23 @@ httptools==0.9.0
     # via uvicorn
 httpx==0.28.1
     # via
+    #   langchain-core
+    #   langgraph-sdk
     #   litestar
     #   prefect
+httpx-sse==0.4.3
+    # via langchain-community
 httpx2==2.13.1
-    # via openai
+    # via
+    #   huggingface-hub
+    #   langsmith
+    #   openai
 httpx2-jsfetch==1.0 ; sys_platform == 'emscripten'
     # via httpx2
 huey==3.4.0
     # via mlflow
+huggingface-hub==2.2.0
+    # via datasets
 humanfriendly==10.0
     # via coloredlogs
 humanize==4.16.0
@@ -343,10 +381,13 @@ idna==3.20
     #   anyio
     #   httpx
     #   httpx2
+    #   instructor
     #   requests
     #   yarl
 importlib-metadata==9.0.1
     # via mlflow-skinny
+instructor==1.17.0
+    # via ragas
 interface-meta==2.0.1
     # via formulaic
 ipykernel==7.4.0
@@ -368,19 +409,24 @@ jinja2==3.1.6
     #   altair
     #   flask
     #   great-expectations
+    #   instructor
     #   jinja2-humanize-extension
     #   prefect
 jinja2-humanize-extension==0.4.0
     # via prefect
-jiter==0.17.0
-    # via openai
+jiter==0.14.0
+    # via
+    #   instructor
+    #   openai
 joblib==1.6.0
     # via
     #   -r requirements.txt
     #   nltk
     #   scikit-learn
 jsonpatch==1.35
-    # via prefect
+    # via
+    #   langchain-core
+    #   prefect
 jsonpointer==3.2.1
     # via jsonpatch
 jsonschema==4.26.0
@@ -403,6 +449,44 @@ kombu==5.6.2
     #   celery
     #   dvc
     #   dvc-task
+langchain==1.4.6
+    # via
+    #   langchain-community
+    #   ragas
+langchain-community==0.3.31
+    # via
+    #   -r requirements.txt
+    #   ragas
+langchain-core==1.6.12
+    # via
+    #   langchain
+    #   langchain-community
+    #   langchain-openai
+    #   langgraph
+    #   langgraph-checkpoint
+    #   langgraph-prebuilt
+    #   langgraph-sdk
+    #   ragas
+langchain-openai==1.7.2
+    # via ragas
+langchain-protocol==0.0.19
+    # via
+    #   langchain-core
+    #   langgraph-sdk
+langgraph==1.2.16
+    # via langchain
+langgraph-checkpoint==4.3.0
+    # via
+    #   langgraph
+    #   langgraph-prebuilt
+langgraph-prebuilt==1.1.1
+    # via langgraph
+langgraph-sdk==0.4.8
+    # via langgraph
+langsmith==0.14.11
+    # via
+    #   langchain-community
+    #   langchain-core
 litestar==2.24.0
     # via evidently
 litestar-htmx==0.5.0
@@ -419,8 +503,10 @@ markupsafe==3.0.4
     #   jinja2
     #   mako
     #   werkzeug
-marshmallow==4.3.1
-    # via great-expectations
+marshmallow==3.26.2
+    # via
+    #   dataclasses-json
+    #   great-expectations
 matplotlib==3.11.2
     # via
     #   -r requirements.txt
@@ -450,6 +536,8 @@ multidict==7.1.0
     #   yarl
 multipart==2.0.1
     # via litestar
+multiprocess==0.70.19
+    # via datasets
 mypy-extensions==1.1.0
     # via typing-inspect
 narwhals==2.27.1
@@ -458,26 +546,34 @@ narwhals==2.27.1
     #   fairlearn
     #   formulaic
     #   scikit-learn
+nest-asyncio==1.6.0
+    # via ragas
 nest-asyncio2==1.7.4
     # via ipykernel
 networkx==3.7
-    # via dvc
+    # via
+    #   dvc
+    #   ragas
 nltk==3.10.3
     # via evidently
 numpy==2.5.4
     # via
     #   -r requirements.txt
     #   contourpy
+    #   datasets
     #   evidently
     #   fairlearn
     #   formulaic
     #   great-expectations
+    #   langchain-community
     #   matplotlib
     #   mlflow
     #   onnxruntime
     #   pandas
     #   patsy
+    #   ragas
     #   scikit-learn
+    #   scikit-network
     #   scipy
     #   skops
     #   statsmodels
@@ -489,8 +585,12 @@ omegaconf==2.3.1
     #   hydra-core
 onnxruntime==1.23.2
     # via -r requirements.txt
-openai==3.32.0
-    # via -r requirements.txt
+openai==3.3.0
+    # via
+    #   -r requirements.txt
+    #   instructor
+    #   langchain-openai
+    #   ragas
 opentelemetry-api==1.45.1
     # via
     #   fastapi
@@ -514,17 +614,26 @@ opentelemetry-semantic-conventions==0.66b1
 orjson==3.13.0
     # via
     #   dvc-data
+    #   langgraph-sdk
+    #   langsmith
     #   prefect
     #   sqltrie
+ormsgpack==1.13.0
+    # via langgraph-checkpoint
 packaging==26.3
     # via
     #   altair
+    #   datasets
     #   deprecation
     #   dvc
     #   great-expectations
+    #   huggingface-hub
     #   hydra-core
     #   ipykernel
     #   kombu
+    #   langchain-core
+    #   langsmith
+    #   marshmallow
     #   matplotlib
     #   mlflow-skinny
     #   mlflow-tracing
@@ -537,6 +646,7 @@ packaging==26.3
 pandas==3.0.6
     # via
     #   -r requirements.txt
+    #   datasets
     #   evidently
     #   fairlearn
     #   formulaic
@@ -560,6 +670,7 @@ pillow==12.3.0
     # via
     #   -r requirements.txt
     #   matplotlib
+    #   ragas
 platformdirs==4.13.0
     # via
     #   dvc
@@ -606,6 +717,7 @@ py-key-value-aio==0.4.6
     # via pydocket
 pyarrow==25.0.1
     # via
+    #   datasets
     #   mlflow
     #   pandas
 pyasn1==0.6.4
@@ -620,14 +732,21 @@ pydantic==2.14.1
     #   fastapi
     #   great-expectations
     #   gto
+    #   instructor
+    #   langchain
+    #   langchain-core
+    #   langgraph
+    #   langsmith
     #   mlflow-skinny
     #   mlflow-tracing
     #   openai
     #   prefect
     #   pydantic-extra-types
     #   pydantic-settings
+    #   ragas
 pydantic-core==2.50.1
     # via
+    #   instructor
     #   prefect
     #   pydantic
 pydantic-extra-types==2.11.1
@@ -635,6 +754,7 @@ pydantic-extra-types==2.11.1
 pydantic-settings==2.15.0
     # via
     #   gto
+    #   langchain-community
     #   prefect
 pydocket==0.27.0
     # via prefect
@@ -661,6 +781,8 @@ pyparsing==3.3.3
     #   great-expectations
     #   matplotlib
     #   pydot
+pypdf==6.21.0
+    # via -r requirements.txt
 pyreadline3==3.5.6 ; sys_platform == 'win32'
     # via humanfriendly
 python-dateutil==2.9.0.post0
@@ -695,7 +817,11 @@ pyyaml==6.0.3
     # via
     #   -r requirements.txt
     #   apprise
+    #   datasets
     #   evidently
+    #   huggingface-hub
+    #   langchain-community
+    #   langchain-core
     #   litestar
     #   mlflow-skinny
     #   omegaconf
@@ -705,6 +831,8 @@ pyzmq==27.2.0
     # via
     #   ipykernel
     #   jupyter-client
+ragas==0.4.3
+    # via -r requirements.txt
 readchar==4.2.2
     # via prefect
 redis==8.1.0
@@ -718,7 +846,9 @@ referencing==0.37.0
 regex==2026.9.29
     # via
     #   dateparser
+    #   instructor
     #   nltk
+    #   tiktoken
 requests==2.34.2
     # via
     #   apprise
@@ -728,22 +858,31 @@ requests==2.34.2
     #   dvc-studio-client
     #   evidently
     #   great-expectations
+    #   instructor
     #   iterative-telemetry
+    #   langchain-community
+    #   langsmith
     #   mlflow-skinny
     #   requests-oauthlib
+    #   requests-toolbelt
+    #   tiktoken
 requests-oauthlib==2.0.0
     # via apprise
+requests-toolbelt==1.0.0
+    # via langsmith
 rfc3339-validator==0.1.4
     # via prefect
-rich==15.0.0
+rich==14.3.4
     # via
     #   cyclopts
     #   dvc
     #   evidently
     #   gto
+    #   instructor
     #   litestar
     #   prefect
     #   pydocket
+    #   ragas
     #   rich-click
     #   rich-rst
     #   typer
@@ -770,6 +909,8 @@ scikit-learn==1.9.1
     #   fairlearn
     #   mlflow
     #   skops
+scikit-network==0.33.5
+    # via ragas
 scipy==1.18.1
     # via
     #   evidently
@@ -778,6 +919,7 @@ scipy==1.18.1
     #   great-expectations
     #   mlflow
     #   scikit-learn
+    #   scikit-network
     #   skops
     #   statsmodels
 scmrepo==3.6.2
@@ -809,12 +951,14 @@ smmap==5.0.3
 sniffio==1.3.1
     # via
     #   asgi-lifespan
+    #   langsmith
     #   litestar
     #   openai
     #   prefect
 sqlalchemy==2.1.4
     # via
     #   alembic
+    #   langchain-community
     #   mlflow
     #   prefect
 sqlparse==0.6.0
@@ -837,11 +981,19 @@ tabulate==0.10.0
     #   dvc
     #   gto
 tenacity==9.2.1
-    # via plotly
+    # via
+    #   instructor
+    #   langchain-community
+    #   langchain-core
+    #   plotly
 text-unidecode==1.3
     # via python-slugify
 threadpoolctl==3.7.0
     # via scikit-learn
+tiktoken==0.14.0
+    # via
+    #   langchain-openai
+    #   ragas
 toml==0.10.2
     # via prefect
 tomlkit==0.15.1
@@ -852,11 +1004,14 @@ tornado==6.5.10
     #   jupyter-client
 tqdm==4.70.1
     # via
+    #   datasets
     #   dvc
     #   dvc-data
     #   fsspec
     #   great-expectations
+    #   huggingface-hub
     #   nltk
+    #   ragas
     #   scmrepo
 traitlets==5.16.1
     # via
@@ -872,7 +1027,9 @@ truststore==0.10.5 ; sys_platform != 'emscripten'
 typer==0.27.3
     # via
     #   evidently
+    #   instructor
     #   pydocket
+    #   ragas
 typing-extensions==4.16.0
     # via
     #   aiohttp
@@ -888,7 +1045,11 @@ typing-extensions==4.16.0
     #   graphene
     #   great-expectations
     #   httpx2
+    #   huggingface-hub
     #   jupyter-client
+    #   langchain-core
+    #   langchain-protocol
+    #   langsmith
     #   litestar
     #   mlflow-skinny
     #   openai
@@ -908,7 +1069,9 @@ typing-extensions==4.16.0
     #   typing-inspect
     #   typing-inspection
 typing-inspect==0.9.0
-    # via evidently
+    # via
+    #   dataclasses-json
+    #   evidently
 typing-inspection==0.4.4
     # via
     #   fastapi
@@ -940,7 +1103,12 @@ urllib3==2.8.0
     #   docker
     #   dulwich
     #   evidently
+    #   instructor
     #   requests
+uuid-utils==0.17.1
+    # via
+    #   langchain-core
+    #   langsmith
 uuid6==2025.0.1
     # via evidently
 uvicorn==0.54.0
@@ -971,6 +1139,8 @@ wcwidth==0.9.2
     #   prompt-toolkit
 websockets==16.1.1
     # via
+    #   langgraph-sdk
+    #   langsmith
     #   prefect
     #   uvicorn
 werkzeug==3.1.9
@@ -981,9 +1151,16 @@ whenever==0.10.5 ; python_full_version >= '3.13'
     # via prefect
 wrapt==2.5.1
     # via formulaic
+xxhash==4.0.1
+    # via
+    #   datasets
+    #   langgraph
+    #   langsmith
 yarl==1.25.1
     # via aiohttp
 zc-lockfile==4.0
     # via dvc
 zipp==4.1.1
     # via importlib-metadata
+zstandard==0.25.0
+    # via langsmith

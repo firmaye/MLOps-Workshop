@@ -23,6 +23,7 @@ import json
 import shutil
 import sys
 import time
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -31,6 +32,8 @@ REPO = Path(__file__).resolve().parent.parent
 MANIFEST = REPO / "scripts" / "downloads.json"
 DEST = REPO / "downloads"          # ignored by git
 CHUNK = 1024 * 1024                # 1 MB
+# some servers refuse requests without a browser-like User-Agent
+USER_AGENT = "Mozilla/5.0 (MLOps-workshop downloader)"
 
 
 def sha256(path):
@@ -55,7 +58,8 @@ def fetch(url, target, size, retries=8):
         have = target.stat().st_size if target.exists() else 0
         if size and have >= size:
             return
-        req = urllib.request.Request(url, headers={"Range": f"bytes={have}-"} if have else {})
+        headers = {"User-Agent": USER_AGENT} | ({"Range": f"bytes={have}-"} if have else {})
+        req = urllib.request.Request(url, headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=60) as resp:
                 # 206 = the server is resuming; 200 = it sent the whole file again
@@ -73,6 +77,14 @@ def fetch(url, target, size, retries=8):
                             last = time.time()
             print(f"\r    {human(have)} downloaded        ")
             return
+        except urllib.error.HTTPError as e:
+            if e.code == 416:       # "range not satisfiable": the file is already complete
+                return
+            if 400 <= e.code < 500:  # refused or not found: retrying won't help
+                raise RuntimeError(f"the server refused the download (HTTP {e.code}); "
+                                   "use the USB copy: python scripts/download.py <group> --from <USB folder>")
+            print(f"\n    server error ({e}); retrying in {2 * attempt} s (attempt {attempt}/{retries})")
+            time.sleep(2 * attempt)
         except Exception as e:  # dropped connection, timeout, ...: wait and resume
             print(f"\n    interrupted ({e}); retrying in {2 * attempt} s (attempt {attempt}/{retries})")
             time.sleep(2 * attempt)

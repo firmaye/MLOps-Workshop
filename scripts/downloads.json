@@ -8,5 +8,49 @@
       "sha256": "07a6be2d8c476007c4f434e239b2cda2e705a2c58f8522fe0088d06fc29390ea",
       "optional": true
     }
+  ],
+  "guidelines": [
+    {
+      "file": "guidelines/ephi_cholera_2022.pdf",
+      "description": "EPHI: National Guideline for Cholera Surveillance and Outbreak Response (2022)",
+      "url": "https://ephi.gov.et/wp-content/uploads/2022/11/Guideline_for_Cholera_Surveillance_and_Outbreak_Response_Final_V2.pdf",
+      "size": 1420584,
+      "sha256": "52c9787ebe5ef32b40bfd6fd6215ec99562e14685e4e04cda8433657a08e1edf"
+    },
+    {
+      "file": "guidelines/ephi_emergency_nutrition_2022.pdf",
+      "description": "EPHI: Emergency Nutrition Guideline (2022)",
+      "url": "https://ephi.gov.et/wp-content/uploads/2022/03/EPHI-Emergency-Nutrition-GuidelineOR.pdf",
+      "size": 1526031,
+      "sha256": "18282698592257a54877566da4d670b6c5aad8d354a07f8c6380986fc02be63d"
+    },
+    {
+      "file": "guidelines/ephi_climate_sensitive_diseases_2022.pdf",
+      "description": "EPHI: Climate-Sensitive Diseases Surveillance Manual (2022)",
+      "url": "https://ephi.gov.et/wp-content/uploads/2022/07/EPHI_cPHEM_EWISMD_Climate_Sensitive_Diseases_Surveillance_Manual_2022.pdf",
+      "size": 1509983,
+      "sha256": "2e479b973f60c807ab9afcd1afb53a623849a6aa80ee431aa712d20f3a2f19fa"
+    },
+    {
+      "file": "guidelines/ephi_cebs_2021.pdf",
+      "description": "EPHI: Community and Event-Based Surveillance Implementation Manual (2021)",
+      "url": "https://ephi.gov.et/wp-content/uploads/2022/07/EPHI_cPHEM_EWISMD_CEBS_Implementation_Manual_2021.pdf",
+      "size": 727545,
+      "sha256": "353a198d86f8c3e092bc4a480738d5310c1df6afc11a575ea6f1400bd30e703a"
+    },
+    {
+      "file": "guidelines/moh_acute_malnutrition_2019.pdf",
+      "description": "Ministry of Health: National Guideline for the Management of Acute Malnutrition (May 2019; copy hosted by the Global Nutrition Cluster)",
+      "url": "https://stg.nutritioncluster.net/sites/nutritioncluster.com/files/2022-06/National%20Guideline%20for%20Management%20of%20Acute%20Malnutrition%20May%202019%20Version.pdf",
+      "size": 15092552,
+      "sha256": "11cf8158014c04b8fabe5074172fd191920fe7ae10c299335ac3a888fde9473b"
+    },
+    {
+      "file": "guidelines/moh_tb_2017.pdf",
+      "description": "Ministry of Health: National Guidelines for TB, DR-TB and Leprosy, 6th edition (2017; copy hosted by WHO AFRO)",
+      "url": "https://afro.who.int/sites/default/files/2019-04/Ethiopia-National%20guidelines%20for%20TB%2C%20DR-TB%20and%20Leprosy%20in%20Ethiopia%20-%20Sixth%20Edition.pdf",
+      "size": 7462526,
+      "sha256": "913a202e1323fd35b6fcf590f8aa60c0fa98304556839b83399ef27d37bf5e63"
+    }
   ]
 }

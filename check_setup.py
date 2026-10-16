@@ -172,18 +172,21 @@ def check_llm_api():
 def check_downloads():
     manifest = json.loads((REPO / "scripts" / "downloads.json").read_text())
     for group, items in manifest.items():
+        if any(i["url"].startswith("TODO") for i in items):
+            report("INFO", f"Data '{group}': not published yet", "nothing to do for now")
+            continue
+        missing = []
         for item in items:
-            if item["url"].startswith("TODO"):
-                report("INFO", f"Data '{group}': not published yet", "nothing to do for now")
-                continue
             target = REPO / "downloads" / item["file"]
             done = (REPO / "downloads" / item["unzip"] / ".complete") if item.get("unzip") else target
-            if target.exists() and target.stat().st_size == item["size"] and done.exists():
-                report("PASS", f"Data '{group}': {item['file']}")
-            elif item.get("optional"):
-                report("INFO", f"Optional data '{group}' not downloaded (fine)", f"`python scripts/download.py {group}` if you want it")
-            else:
-                report("FAIL", f"Data '{group}' missing or incomplete", f"run `python scripts/download.py {group}`")
+            if not (target.exists() and target.stat().st_size == item["size"] and done.exists()):
+                missing.append(Path(item["file"]).name)
+        if not missing:
+            report("PASS", f"Data '{group}': {len(items)} file(s)")
+        elif all(i.get("optional") for i in items):
+            report("INFO", f"Optional data '{group}' not downloaded (fine)", f"`python scripts/download.py {group}` if you want it")
+        else:
+            report("FAIL", f"Data '{group}': {len(missing)} of {len(items)} file(s) missing", f"run `python scripts/download.py {group}`")
 
 
 def main():

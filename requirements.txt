@@ -15,3 +15,6 @@ onnxruntime==1.23.2           # TB X-ray demo: runs the pretrained image model w
 pillow                       # TB X-ray demo: reading and resizing images
 openai>=1.50                 # LLM demo: client for Ollama's OpenAI-compatible API (no OpenAI account needed)
 cryptography<49               # indirect (via evidently, prefect); 49+ dropped Intel-Mac wheels
+ragas>=0.4,<0.5             # LLM demo: evaluating retrieval-augmented answers
+pypdf                        # LLM demo: reading guideline PDFs
+langchain-community<0.4      # indirect (via ragas); 0.4 removed a module ragas 0.4.3 imports

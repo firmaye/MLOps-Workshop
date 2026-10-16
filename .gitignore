@@ -22,3 +22,8 @@ mlartifacts/
 # large files fetched by scripts/download.py
 downloads/
 setup_report.txt
+
+# LLM demo: cached index, saved answers, judge cache
+08-llm-rag/index/
+08-llm-rag/results/
+08-llm-rag/.ragas_cache/
