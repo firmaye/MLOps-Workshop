@@ -33,7 +33,7 @@ MANIFEST = REPO / "scripts" / "downloads.json"
 DEST = REPO / "downloads"          # ignored by git
 CHUNK = 1024 * 1024                # 1 MB
 # some servers refuse requests without a browser-like User-Agent
-USER_AGENT = "Mozilla/5.0 (MLOps-workshop downloader)"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 
 
 def sha256(path):

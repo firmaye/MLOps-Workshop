@@ -206,7 +206,7 @@ def main():
     cols = [c for c in ["id", "type", "hit", "first_right_rank", "cites_a_passage", "refusal_correct",
                         "faithfulness", "context_recall", "factual_correctness"] if c in table]
     print(table[cols].to_string(index=False))
-    print("\nsummary:", {k: round(v, 3) for k, v in summary.items()})
+    print("\nsummary:", {k: round(float(v), 3) for k, v in summary.items()})
 
 
 if __name__ == "__main__":
