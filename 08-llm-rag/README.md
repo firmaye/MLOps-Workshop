@@ -1,9 +1,9 @@
 # 08 – LLM use case: a guideline assistant, and how to evaluate it
 
-> **Status: scaffold.** Retrieval, the evaluation framework and MLflow logging are built and run
-> end to end. The LLM steps need the workshop's OpenRouter key and have only been tested against a
-> local model; numbers with the hosted models come once the key exists. The narrative below is
-> the plan for the session.
+> **Status: scaffold.** Every step runs end to end: retrieval, answering, rule checks, the Ragas
+> judge and MLflow logging, tested with a small open-weight model (Qwen3.5 2B) on a local Ollama server
+> through the same OpenAI-compatible API. Runs against the hosted OpenRouter models need the workshop
+> key; their numbers come once it exists. The narrative below is the plan for the session.
 
 **The use case.** A health worker or surveillance officer asks a question; the assistant finds the
 relevant passages in Ethiopian public health guidelines and an LLM answers **from those passages
@@ -83,6 +83,12 @@ Retrieval on the 22 answerable questions (keyword index, 200-word passages):
 the right passage, however good it is. Fixes to compare in the room: translate the question to
 English before searching, or a multilingual embedding retriever.
 
+**Retrieval right, model wrong (local test, Qwen3.5 2B):** for the cholera-alert question the right
+page was retrieved first, but the small model mixed up the alert definition and said the guideline gives
+no reporting deadline (it says immediately, within 30 minutes). The judge scored it faithfulness 0.67,
+factual correctness 0.33, context recall 1.0: the evaluation localises the fault to the model, not the
+search. One question on a tiny model proves the plumbing, not the hosted models' quality.
+
 **The guidelines contradict each other in places** (found while writing the question set):
 - suspected cholera case: aged 2 years or more in the cholera guideline (p. 14), 5 years or more in
   the climate-sensitive diseases manual (p. 108) and the CEBS manual (p. 14);
@@ -134,7 +140,10 @@ already supports it: set `LLM_BASE_URL` to the self-hosted server's address.
 ## Open items
 
 - OpenRouter key: buy credit, set a spending cap, run `evaluate.py` with the default and a smaller
-  model, and fill the numbers into this README and the notebook.
+  model, and fill the numbers into this README. Check that OpenRouter accepts the "thinking off"
+  switch (`reasoning: {enabled: false}`, taken from third-party sources) for the chosen models.
+- A self-hosted server works too: `LLM_BASE_URL=http://<server>:11434/v1 LLM_API_KEY=anything`
+  (tested with Ollama 0.40.5; on a 4-core CPU a 2B model took about 3 minutes per answer with 5 passages).
 - Clinical review of the question set.
 - Optional: a notebook version of the narrative for the session; a dense (embedding) retriever as
   the fix for the retrieval twist.
