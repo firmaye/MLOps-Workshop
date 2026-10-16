@@ -1,0 +1,12 @@
+{
+  "tb": [
+    {
+      "file": "tb/tb_bundle.zip",
+      "description": "TB X-ray demo: resized chest X-rays from two sites (Sakha-TB, TBX11K; CC BY 4.0) and the pretrained image model",
+      "url": "TODO: GitHub release asset URL",
+      "size": 0,
+      "sha256": "TODO",
+      "unzip": "tb"
+    }
+  ]
+}

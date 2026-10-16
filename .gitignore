@@ -18,3 +18,7 @@ venv/
 mlflow.db
 mlruns/
 mlartifacts/
+
+# large files fetched by scripts/download.py
+downloads/
+setup_report.txt
