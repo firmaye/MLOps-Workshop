@@ -14,3 +14,4 @@ prefect>=3,<4                # tested: 3.8
 onnxruntime==1.23.2           # TB X-ray demo: runs the pretrained image model without PyTorch; last version with Intel-Mac wheels
 pillow                       # TB X-ray demo: reading and resizing images
 openai>=1.50                 # LLM demo: client for Ollama's OpenAI-compatible API (no OpenAI account needed)
+cryptography<49               # indirect (via evidently, prefect); 49+ dropped Intel-Mac wheels

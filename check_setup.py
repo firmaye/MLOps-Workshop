@@ -180,6 +180,8 @@ def check_downloads():
             done = (REPO / "downloads" / item["unzip"] / ".complete") if item.get("unzip") else target
             if target.exists() and target.stat().st_size == item["size"] and done.exists():
                 report("PASS", f"Data '{group}': {item['file']}")
+            elif item.get("optional"):
+                report("INFO", f"Optional data '{group}' not downloaded (fine)", f"`python scripts/download.py {group}` if you want it")
             else:
                 report("FAIL", f"Data '{group}' missing or incomplete", f"run `python scripts/download.py {group}`")
 

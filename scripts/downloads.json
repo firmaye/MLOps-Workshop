@@ -1,12 +1,12 @@
 {
-  "tb": [
+  "tb-model": [
     {
-      "file": "tb/tb_bundle.zip",
-      "description": "TB X-ray demo: resized chest X-rays from two sites (Sakha-TB, TBX11K; CC BY 4.0) and the pretrained image model",
-      "url": "TODO: GitHub release asset URL",
-      "size": 0,
-      "sha256": "TODO",
-      "unzip": "tb"
+      "file": "tb/cxr_densenet121.onnx",
+      "description": "TB X-ray demo (optional): pretrained chest X-ray network, to recompute image features on your laptop",
+      "url": "TODO: publish as a GitHub release asset",
+      "size": 28158650,
+      "sha256": "07a6be2d8c476007c4f434e239b2cda2e705a2c58f8522fe0088d06fc29390ea",
+      "optional": true
     }
   ]
 }

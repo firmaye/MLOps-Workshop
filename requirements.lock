@@ -149,8 +149,9 @@ coolname==5.0.0
     # via prefect
 cronsim==2.7
     # via pydocket
-cryptography==50.0.2
+cryptography==48.0.1
     # via
+    #   -r requirements.txt
     #   asyncssh
     #   evidently
     #   google-auth
