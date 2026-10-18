@@ -762,6 +762,8 @@ pydantic-settings==2.15.0
     #   gto
     #   langchain-community
     #   prefect
+pydicom==3.0.2
+    # via -r requirements.txt
 pydocket==0.27.0
     # via prefect
 pydot==4.0.1
