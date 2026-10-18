@@ -70,14 +70,15 @@ def load_bug_features(anon_ids):
 # ---------------------------------------------------------------- images (optional)
 
 
-def download_images(n=None):
-    """Download the study's DICOM images from Kaggle (all, or the first n listed in the header table)."""
+def download_images(n=None, files=None):
+    """Download study DICOM images from Kaggle: the given file names, or the first n (default: all)."""
     import shutil
 
     import kagglehub
 
     IMAGES.mkdir(parents=True, exist_ok=True)
-    files = pd.read_csv(DATA / "zambia_headers.csv", dtype=str).file.tolist()[:n]
+    if files is None:
+        files = pd.read_csv(DATA / "zambia_headers.csv", dtype=str).file.tolist()[:n]
     for i, f in enumerate(files, 1):
         if not (IMAGES / f).exists():
             shutil.copy(kagglehub.dataset_download(KAGGLE_DATASET, path=KAGGLE_IMAGES + f), IMAGES / f)

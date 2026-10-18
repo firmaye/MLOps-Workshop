@@ -13,7 +13,7 @@ EMR data.
 | 4 | Fairlearn: who does the model miss? Per-group metrics, causes, mitigation | [`04-fairlearn/`](04-fairlearn/) |
 | 5 | Evidently: data drift, prediction drift, performance monitoring | [`05-evidently/`](05-evidently/) |
 | 6 | Prefect: the monthly pipeline that runs all of the above | [`06-prefect/`](06-prefect/) |
-| 7 | Use case: TB chest X-ray screening (images, site shift, shortcut learning) | [`07-tb-xray/`](07-tb-xray/) |
+| 7 | Use case: TB chest X-ray screening (Zambia study: acquisition drift vs population shift) | [`07-tb-xray/`](07-tb-xray/) |
 
 ## Where each tool runs: training vs production, centre vs edge
 

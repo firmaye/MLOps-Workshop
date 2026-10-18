@@ -1,27 +1,32 @@
 # Sources and licences
 
-The images in `images/` are derived from two datasets, both licensed under
-[Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+## The Zambia study
 
-**Changes made to both:** a random sample of 200 TB and 200 normal images per dataset, converted to
-grayscale, centre-cropped to a square and resized to 224 × 224 pixels, saved as PNG and renamed
-(`metadata.csv` maps each file to its original name). Neither dataset's authors endorse this workshop.
+**Google + CIDRZ Health AI Evaluation Zambia**, published by Google Health AI on Kaggle:
+https://www.kaggle.com/datasets/googlehealthai/google-health-ai
+Licence as stated there: *Database: Open Database License (ODbL); Contents: © Original Authors.*
 
-## Site A: TBX11K
+Study: Kazemzadeh S. et al., "Prospective Multi-Site Validation of AI to Detect Tuberculosis and Chest X-Ray
+Abnormalities", *NEJM AI* 2024 (ClinicalTrials.gov NCT05139940). Data collected by the Centre for Infectious
+Disease Research in Zambia (CIDRZ) at Kanyama, Chawama and Chainda South clinics, Lusaka.
 
-Liu, Y., Wu, Y.-H., Ban, Y., Wang, H., Cheng, M.-M. "Rethinking Computer-Aided Tuberculosis
-Diagnosis." IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2020.
-Dataset page: https://mmcheng.net/tb/ — belongs to the Media Computing Lab, Nankai University.
-Lesion areas and types in `metadata.csv` are computed from its bounding-box annotations.
-(The dataset's `imgs/extra` folder, which contains images under other terms, is not used.)
+What is in this folder, and what is not:
 
-## Site B: Dataset of Tuberculosis Chest X-rays Images
+| File | Contents | Derived from |
+|---|---|---|
+| `zambia_headers.csv` | per image: the study's anonymised participant id, file name, and acquisition fields from the DICOM header (manufacturer, software version, photometric interpretation, rows, columns, pixel spacing, bits stored) | the study's DICOM files |
+| `zambia_features.npz` | per image: 1024 numbers computed by the image model below (not reversible to an image) | the study's DICOM files |
+| `zambia_features_bug.npz` | the same for Chainda South's Konica images, computed by a deliberately wrong pipeline (always inverts) | the study's DICOM files |
 
-Kiran, S., Jabeen, I. "Dataset of Tuberculosis Chest X-rays Images." Mendeley Data, version 3.
-https://data.mendeley.com/datasets/8j2g3csprk — images collected from a hospital in Pakistan.
+**Not included:** the images themselves and the participant table (symptoms, HIV status, lab results). Both
+are downloaded from Kaggle by each participant (`python scripts/download.py zambia`; images optional via
+`python 07-tb-xray/tb_helpers.py download-images`). The database is used under the ODbL with attribution;
+the derived features are shared for teaching. If the data owners object, remove the `.npz` files and have
+participants compute features from the downloaded images (`facilitator/build_zambia.py`).
 
-## Image features (`embeddings.npz`)
+## Image features
 
-Computed with the torchxrayvision DenseNet-121 model `densenet121-res224-all`:
-Cohen, J.P. et al. "TorchXRayVision: A library of chest X-ray datasets and models." MIDL 2022.
-https://github.com/mlmed/torchxrayvision (code: Apache-2.0).
+Computed with the torchxrayvision DenseNet-121 model `densenet121-res224-all` (converted to ONNX):
+Cohen J.P. et al., "TorchXRayVision: A library of chest X-ray datasets and models", MIDL 2022.
+https://github.com/mlmed/torchxrayvision (code: Apache-2.0). It was trained on other public chest X-ray
+collections, not on this study's images.

@@ -2,7 +2,7 @@
   "tb-model": [
     {
       "file": "tb/cxr_densenet121.onnx",
-      "description": "TB X-ray demo (optional): pretrained chest X-ray network, to recompute image features on your laptop",
+      "description": "TB X-ray demo (optional): pretrained chest X-ray network, to recompute image features from the downloaded images",
       "url": "TODO: publish as a GitHub release asset",
       "size": 28158650,
       "sha256": "07a6be2d8c476007c4f434e239b2cda2e705a2c58f8522fe0088d06fc29390ea",
@@ -56,7 +56,7 @@
   "zambia": [
     {
       "file": "zambia/GHAI_Final_Data_2023.csv",
-      "description": "TB X-ray demo, part 6: Google + CIDRZ Zambia TB AI study table (HIV status, lab results, AI scores; Kaggle, ODbL)",
+      "description": "TB X-ray demo: the Google + CIDRZ Zambia study's participant table (HIV status, lab results, AI scores; Kaggle, ODbL)",
       "url": "https://www.kaggle.com/datasets/googlehealthai/google-health-ai",
       "kaggle": {
         "dataset": "googlehealthai/google-health-ai",
