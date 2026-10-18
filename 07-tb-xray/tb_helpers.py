@@ -102,3 +102,31 @@ def screening_metrics(y, p, threshold):
         "specificity": 1 - flag[y == 0].mean() if (y == 0).any() else np.nan,  # normals not flagged
         "flag_rate": flag.mean(),                                            # share sent for a lab test
     }
+
+
+# ---------------------------------------------------------------- the Zambia study (part 6)
+
+ZAMBIA_DATASET = "googlehealthai/google-health-ai"   # Google + CIDRZ Health AI Evaluation Zambia (Kaggle)
+ZAMBIA_FILE = "Metadata and Codebook/Metadata and Codebook/GHAI_Final_Data_2023.csv"
+ZAMBIA_LOCAL = HERE.parent / "downloads" / "zambia" / "GHAI_Final_Data_2023.csv"   # USB copy goes here
+
+
+def load_zambia():
+    """One row per participant of the Zambia TB AI study: symptoms, HIV status, lab results and
+    Google's TB AI score. Downloaded once from Kaggle (355 KB; no account needed), then read locally.
+
+    Note: the column the codebook calls "1 - TB Predictions" (`tb_predictions1`) is the TB score:
+    it reproduces the study's decisions at its published thresholds. We rename it `tb_score`.
+    """
+    if not ZAMBIA_LOCAL.exists():
+        import shutil
+
+        import kagglehub
+
+        ZAMBIA_LOCAL.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(kagglehub.dataset_download(ZAMBIA_DATASET, path=ZAMBIA_FILE), ZAMBIA_LOCAL)
+    d = pd.read_csv(ZAMBIA_LOCAL, encoding="utf-8-sig")
+    d["tb"] = (d.ground_truth_tb == "pos").astype(int)        # bacteriologically confirmed (culture / Xpert)
+    d["tb_score"] = d.tb_predictions1
+    d["facility"] = d.facility_code.map({"Kan": "Kanyama", "Cha": "Chawama", "Chai": "Chainda South"})
+    return d

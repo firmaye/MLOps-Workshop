@@ -52,5 +52,18 @@
       "size": 7462526,
       "sha256": "913a202e1323fd35b6fcf590f8aa60c0fa98304556839b83399ef27d37bf5e63"
     }
+  ],
+  "zambia": [
+    {
+      "file": "zambia/GHAI_Final_Data_2023.csv",
+      "description": "TB X-ray demo, part 6: Google + CIDRZ Zambia TB AI study table (HIV status, lab results, AI scores; Kaggle, ODbL)",
+      "url": "https://www.kaggle.com/datasets/googlehealthai/google-health-ai",
+      "kaggle": {
+        "dataset": "googlehealthai/google-health-ai",
+        "path": "Metadata and Codebook/Metadata and Codebook/GHAI_Final_Data_2023.csv"
+      },
+      "size": 363120,
+      "sha256": "dd5f423953f98d93cf1d18da8cdb097481bc390eeebcd289dbe978398ea27872"
+    }
   ]
 }

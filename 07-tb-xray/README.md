@@ -12,8 +12,8 @@ data are **images** and the model moves **between hospitals**. One notebook:
 | Detect | Without labels: image checks (contrast, borders), feature drift (a classifier tells the sites apart with ROC-AUC 1.00; Evidently flags 8 of 10 feature summaries), flag rate. With labels: per-site evaluation. |
 | Respond | A local threshold can't fix it (flags 90% of people). Retraining with **50 labelled local images** does: site B ROC-AUC 0.99, site A unchanged. Promoted under a written rule. |
 | Twist 2: shortcut | TB cases from one hospital, normal controls from another: perfect test score (1.00), but 0.72 once both classes come from the same hospital. The model learned the hospital. |
-| Twist 3: real programme | 50% TB in the test set vs 1–5% in screening: what the same model means for lab workload and positive predictive value; HIV and who gets screened (discussion). |
-| Lesson | Evaluate per site; check whether the site is predictable from the inputs; label-free signals warn, lab results confirm; prevalence and lab capacity set the threshold. |
+| Twist 3: who is screened | A real deployment: Google's TB AI in a prospective study at three Lusaka clinics, every participant lab-tested. People living with HIV: sensitivity 0.71 vs 0.79 (intervals overlap: 75 TB cases is too few to prove it). Previously treated for TB: specificity 0.36, two in three flagged. Clinics in one city: TB prevalence 5–16%. |
+| Lesson | Evaluate per site and per group; check whether the site is predictable from the inputs; label-free signals warn, lab results confirm; plan subgroup sample sizes; lab capacity sets the threshold. |
 
 ## Setup
 
@@ -23,7 +23,8 @@ cd 07-tb-xray
 ```
 Open `tb_screening.ipynb` in VSCode (kernel: `.venv`) and run it top to bottom. Everything it needs
 is in `data/` (about 23 MB, in the repo): 800 resized X-rays, their metadata and precomputed
-image features. MLflow runs go to `mlflow.db` / `mlruns/` in this folder (`mlflow ui` to browse).
+image features. Part 6 also needs the Zambia study table (355 KB): `python scripts/download.py zambia`
+from the repo root (the notebook downloads it itself if it's missing). MLflow runs go to `mlflow.db` / `mlruns/` in this folder (`mlflow ui` to browse).
 
 **Optional:** to recompute image features on your laptop, the notebook looks for the pretrained
 network as `downloads/tb/cxr_densenet121.onnx` (28 MB; `python scripts/download.py tb-model` once
@@ -41,6 +42,14 @@ it is published). Without it, the notebook uses the precomputed features and say
 Changes made: random sampling, conversion to grayscale, centre crop, resize to 224 × 224 PNG.
 `data/metadata.csv` keeps each image's original file name; for site A it also has the annotated
 lesion area and type. Full attribution in [`data/SOURCES.md`](data/SOURCES.md).
+
+**Part 6: the Zambia study.** [Google + CIDRZ Health AI Evaluation Zambia](https://www.kaggle.com/datasets/googlehealthai/google-health-ai)
+(Kaggle; database licensed under the Open Database License, contents © the original authors).
+We use only its participant table: symptoms, HIV status, previous TB, clinic, culture/Xpert results and
+Google's TB AI score for 1,828 people; no images. It is downloaded from Kaggle, not stored here.
+Study: Kazemzadeh et al., "Prospective Multi-Site Validation of AI to Detect Tuberculosis and Chest
+X-Ray Abnormalities", *NEJM AI* 2024. Note: the column documented as "1 − TB Predictions"
+(`tb_predictions1`) is the TB score; it reproduces the study's decisions at its thresholds.
 
 **Why not the well-known Shenzhen and Montgomery sets?** Their terms ask users not to share the
 data outside their own organisation, so they can't be handed to workshop participants.
@@ -69,9 +78,9 @@ laptops need only `onnxruntime`, not PyTorch.
   (fixed splits, deterministic logistic regression).
 - Site A's sensitivity on its own test set is 0.82, not the 0.90 aimed for: 50 TB test images and
   a threshold chosen on 300 training images. Good discussion point on small validation sets.
-- The HIV twist from the design doc is a discussion point, not a computation: no openly
-  shareable chest X-ray dataset records HIV status. Lesion size (in `metadata.csv`) barely changes
-  sensitivity here, so it isn't a convincing stand-in.
+- The HIV comparison is real but not conclusive (overlapping 90% intervals). Say so plainly; the
+  previous-TB effect is the unambiguous one. Positive = bacteriologically confirmed TB; the 207
+  clinically diagnosed participants count as negative, as in the study's reference standard.
 - `facilitator/` rebuilds `data/` from the original downloads (`export_onnx.py` needs PyTorch;
   `prepare_data.py` needs the two datasets). Participants never need it.
 
@@ -83,10 +92,13 @@ laptops need only `onnxruntime`, not PyTorch.
    only **warns**. Which should it be, and who gets the warning?
 3. **Find the shortcut yourself.** Train a classifier to predict the site from the features, using
    only normal images. What does it mean that it succeeds?
-4. **Capacity.** The lab can process 40 tests per 1,000 people screened, prevalence is 2%. Which
-   threshold would you choose for v2, and what sensitivity does that give at site B?
+4. **Capacity.** In the Zambia data, the lab can process 300 tests per 1,000 people screened. Which
+   threshold would you choose, and what sensitivity does it give for people with and without
+   previous TB? Would you use different thresholds for the two groups?
 5. **Monitoring.** Write a function that takes a new batch of image paths and returns a dict with
    the image-check failures, the share flagged and the site-classifier score, ready for a Prefect
    task (compare with the EMR pipeline in lesson 06).
-6. **Version the images.** Track `data/images` with DVC (lesson 01). What happens to `dvc status`
+6. **Other groups.** Repeat part 6 for sex, age bands, and symptom (cough > 2 weeks). Which gaps
+   are large enough to act on, and which are noise?
+7. **Version the images.** Track `data/images` with DVC (lesson 01). What happens to `dvc status`
    when you add one new image?

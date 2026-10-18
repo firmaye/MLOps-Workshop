@@ -442,6 +442,10 @@ jupyter-core==5.9.1
     # via
     #   ipykernel
     #   jupyter-client
+kagglehub==1.0.2
+    # via -r requirements.txt
+kagglesdk==0.1.37
+    # via kagglehub
 kiwisolver==1.5.1
     # via matplotlib
 kombu==5.6.2
@@ -630,6 +634,7 @@ packaging==26.3
     #   huggingface-hub
     #   hydra-core
     #   ipykernel
+    #   kagglehub
     #   kombu
     #   langchain-core
     #   langsmith
@@ -700,6 +705,7 @@ propcache==0.5.4
 protobuf==6.33.6
     # via
     #   databricks-sdk
+    #   kagglesdk
     #   mlflow-skinny
     #   mlflow-tracing
     #   onnxruntime
@@ -820,6 +826,7 @@ pyyaml==6.0.3
     #   datasets
     #   evidently
     #   huggingface-hub
+    #   kagglehub
     #   langchain-community
     #   langchain-core
     #   litestar
@@ -860,6 +867,8 @@ requests==2.34.2
     #   great-expectations
     #   instructor
     #   iterative-telemetry
+    #   kagglehub
+    #   kagglesdk
     #   langchain-community
     #   langsmith
     #   mlflow-skinny
@@ -1010,6 +1019,7 @@ tqdm==4.70.1
     #   fsspec
     #   great-expectations
     #   huggingface-hub
+    #   kagglehub
     #   nltk
     #   ragas
     #   scmrepo

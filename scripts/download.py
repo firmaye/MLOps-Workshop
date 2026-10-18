@@ -14,7 +14,8 @@ What it does, for each file in scripts/downloads.json:
   3. checks the SHA-256 checksum, so a corrupted or incomplete file is never used;
   4. unzips it if the manifest says so.
 
-Only the Python standard library is used, so this works before anything else is installed.
+Only the Python standard library is used, except for files hosted on Kaggle, which need the
+workshop environment (kagglehub) to be installed first.
 """
 
 import argparse
@@ -105,6 +106,11 @@ def get(item, source_dir):
                 src = Path(source_dir) / Path(item["file"]).name
             print(f"    copying from {src}")
             shutil.copyfile(src, target)
+        elif item.get("kaggle"):          # public Kaggle dataset file, fetched with kagglehub
+            import kagglehub
+
+            print(f"    downloading from Kaggle ({item['kaggle']['dataset']})")
+            shutil.copyfile(kagglehub.dataset_download(item["kaggle"]["dataset"], path=item["kaggle"]["path"]), target)
         else:
             if item["url"].startswith("TODO"):
                 raise RuntimeError("this file is not published yet; check back after the organisers' announcement")
