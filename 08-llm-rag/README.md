@@ -99,38 +99,23 @@ An assistant that retrieves from both will sometimes answer from the "wrong" one
 wins is a decision for the programme, not the model (newest? most specific?), and it belongs in the
 prompt or the index, versioned like everything else.
 
-## Planned narrative (six beats)
+## The session
 
-1. **Setting:** a surveillance officer during a cholera outbreak, a nurse managing acute malnutrition.
-2. **First version:** keyword retrieval + an open-weight model. Ask it a few questions live; it sounds right.
-3. **Twists** (each one is a re-run of `evaluate.py` with one setting changed):
-   - **Retrieval misses.** Questions phrased in the health worker's words, not the guideline's,
-     retrieve the wrong page. The answer stays fluent and even "faithful" (to the wrong passage).
-     Only the retrieval layer shows the cause. → evaluate retrieval separately; try a better retriever.
-   - **A cheaper model.** Swap in a smaller model: the averages move a little, but specific
-     questions (doses, cut-offs) change. → the evaluation set as a regression test; compare per question.
-   - **Out of scope and Amharic.** Does it refuse what the guidelines don't cover? Does it answer
-     Amharic questions, and in Amharic? → rule checks, per-language results.
-   - **Guidelines disagree.** Ask the cholera age question; see which document the answer comes from.
-   - **A guideline is updated.** The index fingerprint changes; every earlier score is now about a
-     different system. → version the documents (DVC), re-run the evaluation.
-4. **Detect:** the MLflow comparison view, per-question tables, the three layers side by side.
-5. **Respond:** a promotion rule for assistant versions, written before looking (e.g. no drop in
-   retrieval hit rate, faithfulness ≥ 0.9, every refusal correct, no answerable question newly wrong).
-6. **Lesson:** an LLM application is a pipeline of versioned parts (documents, index, prompt,
-   model); each change needs the same evaluation, and the judge needs checking too.
+The walkthrough is [`LAB_GUIDE.md`](LAB_GUIDE.md): seven episodes (it sounds right; the search that can't read
+Amharic; three layers of evaluation; a cheaper model; the guidelines disagree; a guideline changes; can we trust
+the judge), each with a PAUSE, plus take-home exercises. Timing, what to say and fallbacks are in
+[`FACILITATOR_NOTES.md`](FACILITATOR_NOTES.md).
 
-**Judge check (exercise for the room):** everyone grades 10 answers as correct / partly / wrong;
-compare with Ragas' factual-correctness scores. Where they disagree, who is right?
-
-**Hosted vs self-hosted:** the workshop uses hosted open-weight models with mock questions. Real
-patient information must never go to a hosted service: that is the reason to self-host. The code
-already supports it: set `LLM_BASE_URL` to the self-hosted server's address.
+**Hosted vs self-hosted:** the workshop uses hosted open-weight models with test questions. Real patient
+information must never go to a hosted service: that is the reason to self-host. The code already supports it:
+set `LLM_BASE_URL` to the self-hosted server's address.
 
 ## Files
 
 | File | What |
 |---|---|
+| `LAB_GUIDE.md` | the participant walkthrough (episodes with PAUSEs, exercises) |
+| `FACILITATOR_NOTES.md` | timing, what to say, expected output, fallbacks |
 | `rag.py` | index, retrieve, answer; CLI for single questions |
 | `evaluate.py` | the three evaluation layers, MLflow logging; CLI |
 | `eval_questions.csv` | the question set (draft, needs clinical review) |

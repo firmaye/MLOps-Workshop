@@ -806,6 +806,7 @@ python-dateutil==2.9.0.post0
     #   prefect
 python-dotenv==1.2.4
     # via
+    #   -r requirements.txt
     #   mlflow-skinny
     #   pydantic-settings
     #   uvicorn

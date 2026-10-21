@@ -20,3 +20,4 @@ pypdf                        # LLM demo: reading guideline PDFs
 langchain-community<0.4      # indirect (via ragas); 0.4 removed a module ragas 0.4.3 imports
 kagglehub                    # TB demo: downloads the Zambia study metadata from Kaggle (no account needed for public data)
 pydicom                      # TB demo (optional image route): reading DICOM chest X-rays and their headers
+python-dotenv                # HR use case (separate repo, runs in this environment): reads .env settings

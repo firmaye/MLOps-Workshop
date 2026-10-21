@@ -51,6 +51,8 @@ can recompute the features (`facilitator/build_zambia.py`), look at more images,
    smear-negative TB is more common. Respond: per-group evaluation, enough cases per group, audits.
 7. **Summary:** which check caught what.
 
+Seven **PAUSE** prompts ask participants to commit to an answer before each result is shown.
+
 ## Key messages for the room
 
 - **Nothing crashes when a model moves.** At Chainda South every prediction was a valid probability and every
@@ -68,15 +70,8 @@ can recompute the features (`facilitator/build_zambia.py`), look at more images,
 
 ## Facilitator notes
 
-- All numbers above come from the committed features and the Kaggle table, with fixed splits and seeds.
-- Positive = bacteriologically confirmed TB (culture or Xpert). The 207 clinically diagnosed participants
-  count as negative, as in the study's reference standard.
-- In the Kaggle table, the column documented as "1 − TB Predictions" (`tb_predictions1`) is the TB score: it
-  reproduces the study's decisions at its thresholds (0.305, 0.465). The notebook calls it `google_score`.
-- Kanyama has 11 images from a second machine (Rayence); the header check flags them (3%). Real data.
-- The image model: torchxrayvision DenseNet-121, converted to ONNX (`facilitator/export_onnx.py`, needs
-  PyTorch) so laptops need only `onnxruntime`.
-- Licence: see [`data/SOURCES.md`](data/SOURCES.md). Images and participant table are not in the repo.
+Timing, what to say at each PAUSE, expected numbers, fallbacks and discussion questions:
+[`FACILITATOR_NOTES.md`](FACILITATOR_NOTES.md). Licence notes: [`data/SOURCES.md`](data/SOURCES.md).
 
 ## Exercises
 
