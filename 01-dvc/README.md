@@ -195,6 +195,9 @@ metrics.json  roc_auc      0.8022  0.8122       0.01
 metrics.json  sensitivity  0.5521  0.5702       0.0181
 ```
 
+> **PAUSE (2 min).** ROC-AUC went up and PPV went down. Is v2 better than v1? What would you
+> need to compare them fairly?
+
 **Discussion: is v2 better than v1?** Careful. Because the split is temporal,
 the *test set changed too*: v1 was tested on May–Jun (start of the lean
 season, 12% prevalence), v2 on Nov–Dec (9%). PPV fell because there are fewer
@@ -273,6 +276,9 @@ dvc plots diff v1 -o plots_html    # ROC + PR curves, v1 vs now; open plots_html
 ```
 
 ## Part 8 – The audit question: which data made this model?
+
+> **PAUSE (2 min).** Before running anything: a ministry asks which data trained the model
+> running last June. How would your team answer that today?
 
 *"In June the model flagged a child who wasn't followed up and later became
 severely malnourished. Which model was running, and what was it trained on?"*
@@ -371,6 +377,8 @@ Open `metrics_by_group.json` (sensitivity at one shared threshold):
   ```
   The EMR started storing MUAC in mm (137 instead of 13.7). The pipeline ran
   green and produced a much worse model. Nothing stopped it. → Great Expectations.
+
+  > **PAUSE (2 min).** What should have stopped it, and where in the pipeline?
   (Undo: `rm data/raw/emr_2025-01.csv && dvc add data/raw && dvc repro`.)
 
 ## Exercises

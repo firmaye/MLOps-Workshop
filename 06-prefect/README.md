@@ -63,6 +63,9 @@ months, DVC-tracked), `data/quarantine/`, `data/predictions/`, `reports/` (monit
 
 ## Verified result: the 2025 timeline
 
+> **PAUSE (3 min).** Food distribution stops in April 2025. Before running the timeline:
+> in which month will the pipeline notice, and when will a better model be in service?
+
 `python pipeline.py timeline` replays a scripted year (the "hidden truth" column is what
 the simulator did; the pipeline doesn't know it):
 
@@ -83,6 +86,9 @@ the simulator did; the pipeline doesn't know it):
 months to arrive, and a challenger needs enough post-shift months to beat the champion.
 That lag is real, and it's why early signals (prediction drift, programme information
 like "food distribution stopped") matter.
+
+> **PAUSE (3 min).** Seven months from the shift to an adapted model. What could shorten
+> that, and what would each option cost?
 
 ## In the Prefect UI (http://127.0.0.1:4200)
 

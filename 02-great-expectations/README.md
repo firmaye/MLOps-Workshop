@@ -99,6 +99,9 @@ for s in muac_mm missing_anthro messy_export new_regions concept_shift; do
 done
 ```
 
+> **PAUSE (2 min).** Predict before running: which of the five scenarios will the suite
+> fail, and which will it pass?
+
 Verified results:
 
 | Scenario | Result | What fired |
@@ -113,6 +116,9 @@ Verified results:
 minority of rows. The `muac_cm` failure hits 24% of rows because only Amhara's
 facilities received the EMR update. A mean-based check would have been diluted;
 a per-row range check isn't.
+
+> **PAUSE (2 min).** `new_regions` and `concept_shift` pass. Is that a gap in the suite?
+> Should it catch them?
 
 **The last two rows are the most important.** Half the visits suddenly coming
 from Afar and Somali, or food distribution stopping, produces data that is

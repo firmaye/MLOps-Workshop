@@ -15,6 +15,8 @@ EMR data.
 | 6 | Prefect: the monthly pipeline that runs all of the above | [`06-prefect/`](06-prefect/) |
 | 7 | Use case: TB chest X-ray screening (Zambia study: acquisition drift vs population shift) | [`07-tb-xray/`](07-tb-xray/) |
 
+Facilitators: [`FACILITATOR_NOTES.md`](FACILITATOR_NOTES.md) (lessons 00–06, Tuesday); each use case has its own.
+
 ## Where each tool runs: training vs production, centre vs edge
 
 The MLOps tools in this workshop live **where models are built and managed**. They are
