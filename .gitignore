@@ -23,7 +23,6 @@ mlartifacts/
 downloads/
 setup_report.txt
 
-# LLM demo: cached index, saved answers, judge cache
+# LLM demo: cached index, judge cache (saved answers in results/ are committed: the offline fallback)
 08-llm-rag/index/
-08-llm-rag/results/
 08-llm-rag/.ragas_cache/

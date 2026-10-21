@@ -157,7 +157,8 @@ def thinking_switch(on=False):
     """Extra request arguments that turn a reasoning model's "thinking" on or off.
 
     Providers spell it differently: OpenRouter takes a `reasoning` object; Ollama and vLLM take
-    OpenAI's `reasoning_effort`. (Untested against OpenRouter until the workshop key exists.)
+    OpenAI's `reasoning_effort`. Checked on OpenRouter: gemma-4-26b and qwen3.5-9b accept it (0 reasoning
+    tokens when off); gpt-oss-120b refuses `enabled: False` (400), so the judge never sends it there.
     """
     if os.environ.get("LLM_BASE_URL", OPENROUTER).startswith(OPENROUTER):
         return {"extra_body": {"reasoning": {"enabled": on}}}

@@ -7,8 +7,8 @@ whether it works, and what happens each time you change one of its parts.
 Every episode has the same shape: **do the obvious thing → see the problem → PAUSE: what would you do? → the
 fix → check it.** At each **PAUSE**, write your answer down (2–5 minutes) before reading on.
 
-Numbers marked ✓ were verified on the committed code. Numbers marked *(key)* need the workshop's OpenRouter key
-and are filled in after the facilitators' run.
+Numbers marked ✓ were verified on the committed code. Numbers marked *(key)* come from the facilitators' run with
+the workshop's OpenRouter key (21 Oct); the answers and per-question scores are saved in `results/`.
 
 | # | Episode | Time | Needs the key? |
 |---|---|---|---|
@@ -85,7 +85,14 @@ Each run scores every question three ways:
 | Rules | no | cites a passage; refuses exactly the out-of-scope questions; answers Amharic in Amharic |
 | Ragas (an LLM judge) | yes | faithfulness to the passages; context recall; factual correctness against the reference answer |
 
-Expected *(key)*: summary scores, and a per-question table in MLflow (`per_question.json`).
+Expected *(key)*: a per-question table in MLflow (`per_question.json`), and these summary scores:
+
+| Retrieval hit | Cites a passage | Refusal correct | Amharic in Amharic | Faithfulness | Context recall | Factual correctness |
+|---|---|---|---|---|---|---|
+| 77% | 73% | 21 of 26 | 1 of 2 | 0.66 | 0.67 | 0.41 |
+
+The five wrong refusals are answerable questions the model declined: four whose page was never retrieved
+(`sam_01`, `sam_02`, `csd_03`, `chol_02_am`) and one whose page was (`tb_01`).
 
 > **PAUSE.** Find a question where faithfulness is high but factual correctness is low. What does that
 > combination tell you, and which part of the system is at fault?
@@ -94,6 +101,11 @@ High faithfulness with low correctness means the model faithfully repeated the w
 fault. Low faithfulness with good retrieval means the model added things: a generation fault. This is why the
 layers are scored separately. (In the facilitators' local test with a 2B model: right page retrieved, wrong
 answer, factual correctness 0.33 ✓.)
+
+In the key run *(key)*: `nutr_01` (12% acute malnutrition): right page at rank 1, faithfulness 1.0, factual
+correctness 0.00. The model misread the benchmark table and said it lists no interventions for 10–14% without
+aggravating factors. Wrong reading of the right passage, and the judge still called it faithful. Check `hit`
+before blaming retrieval.
 
 ## Episode 4. A cheaper model (25 min)
 
@@ -107,8 +119,22 @@ answerable question newly wrong**. Then:
 ```bash
 python evaluate.py --model qwen/qwen3.5-9b --run-name "smaller model"
 ```
-Compare the two runs in MLflow, then the per-question tables. Expected *(key)*: averages close; a few specific
-questions (doses, cut-offs) change. Apply your rule. Would you promote it?
+Compare the two runs in MLflow, then the per-question tables. Expected *(key)*:
+
+| Run | Retrieval hit | Cites a passage | Refusal correct | Amharic in Amharic | Faithfulness | Context recall | Factual correctness |
+|---|---|---|---|---|---|---|---|
+| baseline (gemma-4-26b) | 77% | 73% | 21 of 26 | 1 of 2 | 0.66 | 0.67 | 0.41 |
+| smaller model (qwen3.5-9b) | 77% | 95% | 22 of 26 | 0 of 2 | 0.80 | 0.67 | 0.30 |
+
+Averages move in both directions. One answer that changed: `nutr_01` (12% acute malnutrition, no aggravating
+factors). The baseline says the benchmarks list no intervention; the smaller model gives the right one (targeted
+supplementary feeding, therapeutic feeding, no general ration). Factual correctness 0.00 → 0.50. Apply your rule.
+Would you promote it?
+
+With the starting rule *(key)*: **no**. Retrieval is unchanged, but faithfulness is 0.80 (< 0.9), Amharic drops
+from 1 of 2 to 0 of 2, and the rule check counts 3 of 4 out-of-scope questions as not refused. Read those three:
+the model does refuse, in its own words ("The provided guidelines do not cover…"). The rule matches one exact
+sentence. A rule check can be wrong too. (The baseline doesn't reach faithfulness 0.9 either.)
 
 ## Episode 5. The guidelines disagree (15 min)
 
@@ -149,6 +175,10 @@ yourself: correct, partly correct, or wrong. Then compare with the `factual_corr
 
 A judge must be checked against people's grades on a sample before its scores are trusted, and re-checked
 whenever the judge model changes.
+
+From the key run *(key)*: `csd_01` repeats the reference word for word and gets factual correctness 0.00 in both
+runs. `cebs_02` gets 1.0 for the baseline and 0.00 for the smaller model, though both answers say the same thing.
+Three of 132 judge calls hit the output limit and have no score.
 
 ---
 

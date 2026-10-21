@@ -37,11 +37,17 @@ refusals; Amharic; cost and speed.
 passages. Say: "No answer model can fix a passage it never sees." The k=10 Amharic hit is luck (the Latin
 abbreviation "INH" in the question), not understanding: point that out.
 
-**Ep 3.** Fill in the summary after the key run. Find a question with high faithfulness and low correctness
-before the session so you can show it. Say: "Faithful to the wrong passage is still wrong."
+**Ep 3.** Key run (gemma-4-26b): hit 77%, cites 73%, refusals 21 of 26, Amharic 1 of 2, faithfulness 0.66,
+context recall 0.67, factual correctness 0.41. Show `nutr_01`: right page at rank 1, faithfulness 1.0, factual
+correctness 0.00 (it misread the benchmark table). Not a retrieval fault: point at `hit`. The five wrong refusals
+are answerable questions it declined, four with the page never retrieved. Say: "Faithful to the wrong reading is
+still wrong."
 
-**Ep 4.** Insist the rule is written before the run. Fill in the comparison after the key run; pick one question
-whose answer changed for the projector.
+**Ep 4.** Insist the rule is written before the run. Key run (qwen3.5-9b): hit 77%, cites 95%, refusals 22 of 26,
+Amharic 0 of 2, faithfulness 0.80, context recall 0.67, factual correctness 0.30. On the projector: `nutr_01`,
+where the smaller model gets right what the baseline got wrong (0.00 → 0.50). The starting rule fails: faithfulness
+< 0.9, Amharic lost. Then the trap: its out-of-scope "failures" (`oos_01`, `oos_03`, `oos_04`) are refusals in
+other words. The rule check matches one exact sentence. Ask: whose fault is that, the model's or the check's?
 
 **Ep 5.** Verified: the question retrieves passages from all three conflicting documents (cholera p.14 says 2
 years; climate-sensitive diseases manual p.108 and CEBS manual p.14 say 5 years). Also known: the vitamin A
@@ -51,13 +57,14 @@ guideline (p.19). Say: "This is a programme decision, not a model decision."
 **Ep 6.** Verified: `--chunk-words 120` changes the fingerprint and drops the hit rate to 73%. Link back to DVC
 (day 1): the documents are data and should be versioned the same way.
 
-**Ep 7.** Pairs grade, then call out disagreements. Expect the judge to be strict on wording and lenient on
+**Ep 7.** Pairs grade, then call out disagreements. Have ready: `csd_01` (matches the reference, scored 0.00) and
+`cebs_02` (same answer from both models, scored 1.0 and 0.00). Expect the judge to be strict on wording and lenient on
 missing details, or the reverse; either way the point is to measure it.
 
 ## Fallbacks
 
 - **The API is down or slow:** episodes 2, 5 (search) and 6 need no key. For 3, 4 and 7, open the saved answers
-  in `results/` (copied from the facilitators' run onto the USB stick) and the MLflow screenshots.
+  and per-question scores in `results/` (committed from the facilitators' run) and the MLflow screenshots.
 - **The venue internet is down:** guidelines from the USB stick (`python scripts/download.py guidelines --from <USB>`).
 - **Rate limits with 20 people at once:** stagger runs by table; `--limit 10` runs the first ten questions only.
 
@@ -73,8 +80,9 @@ missing details, or the reverse; either way the point is to measure it.
 
 ## Before the day
 
-- [ ] Buy the OpenRouter credit, set the spending cap, run `python evaluate.py --run-name baseline` and the
-      smaller model; fill the *(key)* numbers into `LAB_GUIDE.md`.
+- [x] Buy the OpenRouter credit, set the spending cap, run `python evaluate.py --run-name baseline` and the
+      smaller model; fill the *(key)* numbers into `LAB_GUIDE.md`. (21 Oct; answers and scores in `results/`.)
 - [ ] Copy `results/` (saved answers) and `.ragas_cache/` to the USB stick as the fallback.
-- [ ] Check OpenRouter accepts the "thinking off" switch for the chosen models (`rag.thinking_switch`).
+- [x] Check OpenRouter accepts the "thinking off" switch for the chosen models (`rag.thinking_switch`). Gemma and
+      Qwen: yes. gpt-oss-120b refuses it (400); the judge doesn't send it on OpenRouter.
 - [ ] Clinical review of `eval_questions.csv`; Amharic review of the two Amharic questions.
