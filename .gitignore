@@ -26,3 +26,7 @@ setup_report.txt
 # LLM demo: cached index, judge cache (saved answers in results/ are committed: the offline fallback)
 08-llm-rag/index/
 08-llm-rag/.ragas_cache/
+
+# LLM demo: LlamaParse responses and pilot output (facilitator/parse_guidelines.py; the Markdown is committed)
+08-llm-rag/facilitator/raw/
+08-llm-rag/facilitator/pilot/

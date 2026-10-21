@@ -5,6 +5,7 @@
     python evaluate.py --k 2 --run-name "fewer passages"
     python evaluate.py --retrieval-only                  # no LLM at all: only checks the search step
     python evaluate.py --retrieval-only --retriever embed   # the same, with the embedding retriever
+    python evaluate.py --retrieval-only --docs markdown  # the same, on the Markdown versions of the PDFs
     python evaluate.py --no-judge                        # answers + rule checks, skip the Ragas judge
 
 Three layers of evaluation, cheapest first:
@@ -68,7 +69,7 @@ def retrieval_checks(questions, retriever, k):
 
 
 def run_key(settings, n_questions):
-    params = asdict(settings)
+    params = rag.run_params(settings)
     if params["retriever"] == "tfidf":       # added later: answers saved before the switch existed keep their key
         del params["retriever"]
     blob = json.dumps(params, sort_keys=True) + rag.PROMPTS[settings.prompt_version] + str(n_questions)
@@ -197,6 +198,7 @@ def main():
     ap.add_argument("--model", default=rag.Settings.model)
     ap.add_argument("--k", type=int, default=rag.Settings.k)
     ap.add_argument("--retriever", default=rag.Settings.retriever, choices=["tfidf", "embed"])
+    ap.add_argument("--docs", default=rag.Settings.docs, choices=["pdf", "markdown"])
     ap.add_argument("--chunk-words", type=int, default=rag.Settings.chunk_words)
     ap.add_argument("--prompt", default=rag.Settings.prompt_version, choices=list(rag.PROMPTS))
     ap.add_argument("--judge-model", default=JUDGE_MODEL)
@@ -205,7 +207,8 @@ def main():
     ap.add_argument("--retrieval-only", action="store_true")
     ap.add_argument("--no-judge", action="store_true")
     a = ap.parse_args()
-    settings = rag.Settings(model=a.model, k=a.k, chunk_words=a.chunk_words, prompt_version=a.prompt, retriever=a.retriever)
+    settings = rag.Settings(model=a.model, k=a.k, chunk_words=a.chunk_words, prompt_version=a.prompt, retriever=a.retriever,
+                            docs=a.docs)
     table, summary = evaluate(settings, a.run_name, a.retrieval_only, not a.no_judge, a.judge_model, a.limit)
     pd.set_option("display.width", 200, "display.max_colwidth", 60)
     cols = [c for c in ["id", "type", "hit", "first_right_rank", "cites_a_passage", "refusal_correct",

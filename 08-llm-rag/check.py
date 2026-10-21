@@ -21,7 +21,6 @@ page it rests on. evaluate_check.py scores a version on all of them.
 import argparse
 import json
 import re
-from dataclasses import asdict
 
 import pandas as pd
 
@@ -203,7 +202,7 @@ def check(r, retriever, settings=rag.Settings(), version="v2", client=None):
         verdict, reason = compare(r, rule, hits.text.tolist()) if rule else ("", raw)
     return {"id": r.id, "verdict": verdict, "reason": reason, "rule": rule, "raw": raw,
             "contexts": hits.text.tolist(), "sources": [f"{d}:p{p}" for d, p in zip(hits.doc, hits.page)],
-            "version": version, "settings": asdict(settings)}
+            "version": version, "settings": rag.run_params(settings)}
 
 
 def main():
@@ -213,8 +212,9 @@ def main():
     ap.add_argument("--model", default=rag.Settings.model)
     ap.add_argument("--k", type=int, default=K)
     ap.add_argument("--retriever", default=RETRIEVER, choices=["tfidf", "embed"])
+    ap.add_argument("--docs", default=rag.Settings.docs, choices=["pdf", "markdown"])
     a = ap.parse_args()
-    s = rag.Settings(model=a.model, k=a.k, retriever=a.retriever)
+    s = rag.Settings(model=a.model, k=a.k, retriever=a.retriever, docs=a.docs)
     r = next(load_records().query("id == @a.record").itertuples())
     out = check(r, rag.build(s), s, a.version)
     print(f"{patient(r)}\nPrescription: {r.prescription}\n\nPassages: {', '.join(out['sources'])}")

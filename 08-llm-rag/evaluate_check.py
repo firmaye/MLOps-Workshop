@@ -5,6 +5,7 @@
     python evaluate_check.py --version v2 --model qwen/qwen3.5-9b --run-name "v2, smaller model"
     python evaluate_check.py --retrieval-only           # no LLM: is the right guideline page among the passages?
     python evaluate_check.py --retrieval-only --retriever tfidf     # the same, with rag.py's keyword search
+    python evaluate_check.py --version v2 --docs markdown --run-name "v2, Markdown"   # the guidelines as Markdown
     python evaluate_check.py --no-judge                 # skip the Ragas judge
 
 What matters once the check sits in a workflow:
@@ -51,7 +52,7 @@ def retrieval_checks(records, retriever, k):
 def get_verdicts(records, retriever, settings, version):
     """Check every record, or reuse saved verdicts from an identical earlier run."""
     RESULTS.mkdir(exist_ok=True)
-    blob = json.dumps(asdict(settings), sort_keys=True) + version + check.PROMPTS[version] + str(len(records))
+    blob = json.dumps(rag.run_params(settings), sort_keys=True) + version + check.PROMPTS[version] + str(len(records))
     path = RESULTS / f"check_{version}_{hashlib.md5(blob.encode()).hexdigest()[:10]}.jsonl"
     if path.exists():
         print(f"reusing saved verdicts: {path.name}")
@@ -161,13 +162,14 @@ def main():
     ap.add_argument("--model", default=rag.Settings.model)
     ap.add_argument("--k", type=int, default=check.K)
     ap.add_argument("--retriever", default=check.RETRIEVER, choices=["tfidf", "embed"])
+    ap.add_argument("--docs", default=rag.Settings.docs, choices=["pdf", "markdown"])
     ap.add_argument("--judge-model", default=JUDGE_MODEL)
     ap.add_argument("--run-name")
     ap.add_argument("--limit", type=int, help="only the first N records (quick test)")
     ap.add_argument("--retrieval-only", action="store_true")
     ap.add_argument("--no-judge", action="store_true")
     a = ap.parse_args()
-    settings = rag.Settings(model=a.model, k=a.k, retriever=a.retriever)
+    settings = rag.Settings(model=a.model, k=a.k, retriever=a.retriever, docs=a.docs)
     table, summary, counts = evaluate(settings, a.version, a.run_name, a.retrieval_only, not a.no_judge, a.judge_model, a.limit)
     pd.set_option("display.width", 200, "display.max_colwidth", 70)
     cols = [c for c in ["id", "expected", "error_type", "hit", "verdict", "faithfulness", "reason"] if c in table]

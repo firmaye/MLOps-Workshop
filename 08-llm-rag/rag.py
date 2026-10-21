@@ -3,6 +3,7 @@
     python rag.py "What is the community case definition of suspected cholera?"
     python rag.py "..." --model qwen/qwen3.5-9b --k 8
     python rag.py "..." --retriever embed
+    python rag.py "..." --docs markdown       # the Markdown versions of the PDFs (guidelines_md/)
 
 How it works, in three steps:
   1. **Index** (once): read the guideline PDFs, cut each page into overlapping passages of
@@ -36,6 +37,7 @@ import pandas as pd
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
 DOCS = REPO / "downloads" / "guidelines"          # filled by: python scripts/download.py guidelines
+DOCS_MD = HERE / "guidelines_md"                  # the same PDFs as Markdown (LlamaParse, once: facilitator/parse_guidelines.py)
 INDEX_CACHE = HERE / "index"                      # passages, cached after the first run
 
 OPENROUTER = "https://openrouter.ai/api/v1"
@@ -56,6 +58,15 @@ class Settings:
     prompt_version: str = "v1"
     temperature: float = 0.0                       # as repeatable as the provider allows
     thinking: bool = False                         # "reasoning" models think before answering: slower, costlier
+    docs: str = "pdf"                              # "pdf" (text pulled from the PDFs) or "markdown" (guidelines_md/)
+
+
+def run_params(settings):
+    """The settings as saved with a run. `docs` was added later: runs on the PDFs keep their saved key."""
+    params = asdict(settings)
+    if params["docs"] == "pdf":
+        del params["docs"]
+    return params
 
 
 PROMPTS = {
@@ -102,6 +113,128 @@ def make_passages(pages, chunk_words=200, overlap_words=40):
         words = p.text.split()
         for start in range(0, max(len(words) - overlap_words, 1), step):
             rows.append({"doc": p.doc, "page": p.page, "text": " ".join(words[start:start + chunk_words])})
+    passages = pd.DataFrame(rows)
+    passages.insert(0, "passage_id", [f"{d}:p{pg}:{i}" for i, (d, pg) in enumerate(zip(passages.doc, passages.page))])
+    return passages
+
+
+PAGE_MARK = re.compile(r"<!-- page (\d+)[^>]*-->")
+HEADING = re.compile(r"#{1,6} ")
+
+
+def markdown_blocks(text):
+    """Split a Markdown file into blocks: (page, kind, text). A table or a fenced block (a flowchart) is one block."""
+    blocks, page, lines = [], None, text.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        mark = PAGE_MARK.match(line.strip())
+        if mark:
+            page, i = int(mark.group(1)), i + 1
+        elif page is None or not line.strip():
+            i += 1
+        elif line.startswith("```"):
+            j = next((j for j in range(i + 1, len(lines)) if lines[j].startswith("```")), len(lines) - 1)
+            blocks.append((page, "figure", "\n".join(lines[i:j + 1])))
+            i = j + 1
+        elif line.lstrip().startswith("|"):
+            j = i
+            while j < len(lines) and lines[j].lstrip().startswith("|"):
+                j += 1
+            blocks.append((page, "table", "\n".join(lines[i:j])))
+            i = j
+        elif HEADING.match(line):
+            blocks.append((page, "heading", line.strip()))
+            i += 1
+        else:
+            j = i
+            while j < len(lines) and lines[j].strip() and not PAGE_MARK.match(lines[j].strip()) \
+                    and not HEADING.match(lines[j]) and not lines[j].lstrip().startswith(("|", "```")):
+                j += 1
+            blocks.append((page, "text", "\n".join(lines[i:j])))
+            i = j
+    return [(p, k, re.sub(r"<br\s*/?>", " ", t)) for p, k, t in blocks]
+
+
+MERMAID_NODE = re.compile(r'\b([A-Za-z]\w*)\s*[\[({]+(?:"(.*?)"|([^"\])}]*))[\])}]+')
+MERMAID_EDGE = re.compile(r"([A-Za-z]\w*)\s*(?:-->|---|-\.->|==>)\s*(?:\|\s*\"?(.*?)\"?\s*\|)?\s*([A-Za-z]\w*)")
+
+
+def flowchart_text(block):
+    """A Mermaid flowchart (how LlamaParse writes most diagrams) as plain lines: each box, then each arrow.
+    Other fenced blocks pass through unchanged."""
+    if not block.startswith("```mermaid"):
+        return block
+    labels, lines = {}, []
+    for node, quoted, bare in MERMAID_NODE.findall(block):
+        label = re.sub(r"\*\*|<br\s*/?>", " ", quoted or bare).strip()
+        if node not in labels and label:
+            labels[node] = label
+            lines.append(f"- {label}")
+    def short(n):
+        return re.split(r"\s\*\s|[.:]\s", labels.get(n, n))[0][:60].strip()
+    for a, cond, b in MERMAID_EDGE.findall(block.replace("|>", "|")):
+        lines.append(f"- {short(a)} → {short(b)}" + (f" (if {cond.strip()})" if cond.strip() else ""))
+    return "\n".join(lines)
+
+
+def make_markdown_passages(folder=DOCS_MD, chunk_words=200, overlap_words=40):
+    """Passages from the Markdown files: cut at headings and page breaks, never inside a table or a figure.
+
+    A heading starts a new passage unless the passage so far is short (under half of chunk_words): then the
+    small sections are packed together, as tiny passages crowd the keyword search. A passage that does not start
+    with a heading gets its section's heading on top, so a table keeps the heading that says what it is.
+    A passage never crosses pages (citations stay exact, as with the PDFs); a table or figure longer than
+    chunk_words stays whole; a long paragraph is cut into overlapping pieces as on the PDF side.
+    """
+    files = sorted(Path(folder).glob("*.md"))
+    if not files:
+        raise FileNotFoundError(f"no Markdown files in {folder}")
+    rows, step = [], chunk_words - overlap_words
+    for f in files:
+        heading, current, page = "", [], None
+
+        def words():
+            return sum(len(c.split()) for c in current)
+
+        def flush():
+            body = "\n\n".join(current).strip()
+            if len(body.split()) >= 5:
+                text = body if HEADING.match(body) or not heading else f"{heading}\n\n{body}"
+                rows.append({"doc": f.stem, "page": page, "text": text})
+            current.clear()
+
+        for p, kind, text in markdown_blocks(f.read_text()):
+            if p != page:
+                flush()
+                page = p
+            if kind == "figure":
+                text = flowchart_text(text)
+            n = len(text.split())
+            if kind == "heading":
+                if words() >= chunk_words // 2:
+                    flush()
+                if not current:
+                    heading = text
+            elif kind == "text" and n > chunk_words:          # a long paragraph or list: pieces, line by line
+                if words() >= chunk_words // 2:
+                    flush()
+                for line in text.splitlines():
+                    w = line.split()
+                    if len(w) > chunk_words:                   # one very long line: overlapping word windows
+                        flush()
+                        for start in range(0, max(len(w) - overlap_words, 1), step):
+                            current.append(" ".join(w[start:start + chunk_words]))
+                            flush()
+                    else:
+                        if words() + len(w) > chunk_words:
+                            flush()
+                        current.append(line)
+                continue
+            elif current and words() + n > chunk_words and (kind == "text" or words() >= chunk_words // 2):
+                flush()                     # but a table or figure stays with a short lead-in (its caption)
+            current.append(text)
+        flush()
     passages = pd.DataFrame(rows)
     passages.insert(0, "passage_id", [f"{d}:p{pg}:{i}" for i, (d, pg) in enumerate(zip(passages.doc, passages.page))])
     return passages
@@ -163,7 +296,9 @@ def build(settings=Settings(), folder=DOCS):
     """Load (or reuse) the passages for these chunk settings and return a Retriever."""
     INDEX_CACHE.mkdir(exist_ok=True)
     cache = INDEX_CACHE / f"passages_{settings.chunk_words}_{settings.overlap_words}.parquet"
-    if cache.exists():
+    if settings.docs == "markdown":      # a second's work: rebuilt every time, so an edited file is never stale
+        passages = make_markdown_passages(DOCS_MD, settings.chunk_words, settings.overlap_words)
+    elif cache.exists():
         passages = pd.read_parquet(cache)
     else:
         passages = make_passages(load_pages(folder), settings.chunk_words, settings.overlap_words)
@@ -220,7 +355,7 @@ def answer(question, retriever, settings=Settings(), client=None):
         "sources": [f"{d}:p{p}" for d, p in zip(hits.doc, hits.page)],
         "seconds": round(time.time() - t0, 2),
         "tokens": getattr(response.usage, "total_tokens", None),
-        "settings": asdict(settings),
+        "settings": run_params(settings),
     }
 
 
@@ -230,9 +365,10 @@ def main():
     ap.add_argument("--model", default=Settings.model)
     ap.add_argument("--k", type=int, default=Settings.k)
     ap.add_argument("--retriever", default=Settings.retriever, choices=["tfidf", "embed"])
+    ap.add_argument("--docs", default=Settings.docs, choices=["pdf", "markdown"])
     ap.add_argument("--search-only", action="store_true", help="show the retrieved passages; no LLM call")
     a = ap.parse_args()
-    s = Settings(model=a.model, k=a.k, retriever=a.retriever)
+    s = Settings(model=a.model, k=a.k, retriever=a.retriever, docs=a.docs)
     retriever = build(s)
     titles = document_titles()
     hits = retriever.search(a.question, s.k)

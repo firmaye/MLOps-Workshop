@@ -1,0 +1,69 @@
+{
+ "date": "2026-10-21",
+ "params": {
+  "tier": "agentic",
+  "version": "2026-10-16",
+  "agentic_options": {
+   "custom_prompt": "This is a national clinical and public health guideline. Reconstruct every table as a Markdown table, keeping every row, every column and every number exactly as printed (doses, mg/kg, weight bands, age bands, volumes, units). Give each table exactly ONE header row: when the printed table has two header rows or merged header cells, join them into each column's header (e.g. 'Volume per feed (ml): every 2 hours (12 feeds)'), never as a data row. Transcribe flowcharts, algorithms and decision diagrams as nested Markdown lists that follow the boxes and arrows, keeping every box's text and every branch condition (yes/no, cut-offs). Describe charts and graphs as a table of their values plus one sentence on what they show. Keep heading levels as in the document. Do not add anything that is not on the page."
+  },
+  "processing_options": {
+   "ocr_parameters": {
+    "languages": [
+     "en"
+    ]
+   }
+  },
+  "output_options": {
+   "markdown": {
+    "tables": {
+     "output_tables_as_markdown": true,
+     "merge_continued_tables": false,
+     "compact_markdown_tables": true
+    },
+    "inline_images": true
+   },
+   "extract_printed_page_number": true
+  }
+ },
+ "expand": [
+  "markdown",
+  "metadata"
+ ],
+ "documents": {
+  "ephi_cebs_2021": {
+   "pages": 50,
+   "job": "pjb-6u6u74fduev8jueh3w1q7mwp1xog",
+   "parsed_at": "2026-10-21T19:23:16.034563Z"
+  },
+  "ephi_cholera_2022": {
+   "pages": 124,
+   "job": "pjb-n25im1neiay8q62amthpcuhbzwi3",
+   "parsed_at": "2026-10-21T19:23:55.228910Z"
+  },
+  "ephi_climate_sensitive_diseases_2022": {
+   "pages": 110,
+   "job": "pjb-2p8l4sawg3xvo5nkeawil0tg3h7z",
+   "parsed_at": "2026-10-21T19:25:34.182715Z"
+  },
+  "ephi_emergency_nutrition_2022": {
+   "pages": 92,
+   "job": "pjb-g1r7z737j5g0505n8fpl6pgnvcug",
+   "parsed_at": "2026-10-21T19:26:18.829812Z"
+  },
+  "moh_acute_malnutrition_2019": {
+   "pages": 156,
+   "job": "pjb-o840baa2t478f44alu0gi2ypd33m",
+   "parsed_at": "2026-10-21T19:26:52.749725Z"
+  },
+  "moh_tb_2017": {
+   "pages": 217,
+   "job": "pjb-dr65eq3k5ta4srn7dec9jyta815i",
+   "parsed_at": "2026-10-21T19:27:48.578950Z"
+  }
+ },
+ "credits": {
+  "full_parse": 7480,
+  "pilots": 420,
+  "note": "from the account balance (20,000 -> 19,580 after the pilots -> 12,100 after the full parse); the job usage field comes back empty on the free plan"
+ }
+}
