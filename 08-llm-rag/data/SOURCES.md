@@ -112,6 +112,6 @@ azithromycin "20 mg/kg (max 1 g)" as maximum 1, a g/mg slip that Python flags as
 rx42 now pass a wrong prescription (rx34: the rule came back with a maximum and no minimum, so no amount was
 compared; rx42: the general 10 mg/kg rule instead of the under-five restriction). rx29's reply holds two JSON
 objects (a self-correction), which `check.parse()` cannot read, so its verdict is empty. One run each, so part of
-this is the model's run-to-run variation. The judge failed on 27 records with OpenRouter error 402 (the account's
-credit ran out during the run); re-running `evaluate_check.py --version v2 --docs markdown` reuses the saved
-verdicts and only repeats the judge calls.
+this is the model's run-to-run variation. The judge failed on 27 records with OpenRouter error 402: the account had
+no credit loaded (the $0.19 spent so far was all its usage), and OpenRouter reserves the worst-case cost of each
+in-flight request (the judge allows 8,192 output tokens, 4 at a time). Credit has since been added.
