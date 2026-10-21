@@ -14,7 +14,7 @@ EMR data.
 | 5 | Evidently: data drift, prediction drift, performance monitoring | [`05-evidently/`](05-evidently/) |
 | 6 | Prefect: the monthly pipeline that runs all of the above | [`06-prefect/`](06-prefect/) |
 | 7 | Use case: TB chest X-ray screening (Zambia study: acquisition drift vs population shift) | [`07-tb-xray/`](07-tb-xray/) |
-| 8 | Use case: LLM over the national guidelines: (A) evaluating a RAG assistant; (B) a prescription check inside the EMR: does it catch the errors? | [`08-llm-rag/`](08-llm-rag/) |
+| 8 | Use case: an LLM assistant over the national guidelines: search as a versioned part, Ragas in depth, rubrics graded by people and by a checked judge, a cheaper model through the promotion rule | [`08-llm-rag/`](08-llm-rag/) |
 
 Facilitators: [`FACILITATOR_NOTES.md`](FACILITATOR_NOTES.md) (lessons 00–06, Tuesday); each use case has its own.
 
