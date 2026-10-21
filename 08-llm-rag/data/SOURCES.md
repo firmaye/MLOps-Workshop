@@ -129,9 +129,11 @@ Most of the Markdown gain is the table-based records: on the PDF the LLM's quote
 isoniazid weight bands, rx36–rx40) fails the grounding test and the verdict is "unsure"; quoted from a Markdown
 table row it passes. Structure-based chunks add a few more right verdicts, as a dosing rule and its table now
 arrive in one passage. One run per configuration, so a difference of one or two records is within the model's
-run-to-run variation. Recurring extraction errors on Markdown: a time in minutes taken as hours (rx10), azithromycin's
-"max 1 g" taken as 1 (mg), the general isoniazid rule used instead of the under-five restriction (rx42); replies
-with two JSON objects (a self-correction) leave `check.parse()` with no verdict.
+run-to-run variation. Recurring on Markdown in both new runs: azithromycin's
+"max 1 g" extracted as a maximum of 1 (mg), which Python flags as inconsistent ("unsure", rx07–rx09 with fixed
+chunks, rx08–rx09 with structure); the Plan C quote copied across table cells, which fails the grounding test
+(rx10, "unsure"); and replies holding two JSON objects (a self-correction), which leave `check.parse()` with no
+verdict (rx42 in both; rx37 and rx39 too with fixed chunks).
 
 An earlier Markdown loader (page-bounded, cut at headings; replaced by the two above) is kept in
 `results/check_v2_llm_reads_python_counts_markdown.csv` for the record: 17/22 caught, 6/44 unsure; its judge scored
