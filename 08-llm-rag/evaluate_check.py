@@ -5,7 +5,7 @@
     python evaluate_check.py --version v2 --model qwen/qwen3.5-9b --run-name "v2, smaller model"
     python evaluate_check.py --retrieval-only           # no LLM: is the right guideline page among the passages?
     python evaluate_check.py --retrieval-only --retriever tfidf     # the same, with rag.py's keyword search
-    python evaluate_check.py --version v2 --docs markdown --run-name "v2, Markdown"   # the guidelines as Markdown
+    python evaluate_check.py --version v2 --docs markdown --chunking structure --run-name "v2, Markdown, structure"
     python evaluate_check.py --no-judge                 # skip the Ragas judge
 
 What matters once the check sits in a workflow:
@@ -44,8 +44,7 @@ def retrieval_checks(records, retriever, k):
     for r in records.itertuples():
         pages = [int(p) for p in str(r.pages).split(";") if p.strip()]
         hits = retriever.search(check.search_query(r), k)
-        rows.append({"id": r.id, "hit": any(d == r.doc and p in pages for d, p in zip(hits.doc, hits.page))
-                     if pages else None})
+        rows.append({"id": r.id, "hit": any(rag.on_pages(hits, r.doc, pages)) if pages else None})
     return pd.DataFrame(rows)
 
 
@@ -163,13 +162,14 @@ def main():
     ap.add_argument("--k", type=int, default=check.K)
     ap.add_argument("--retriever", default=check.RETRIEVER, choices=["tfidf", "embed"])
     ap.add_argument("--docs", default=rag.Settings.docs, choices=["pdf", "markdown"])
+    ap.add_argument("--chunking", default=rag.Settings.chunking, choices=rag.CHUNKINGS, help="'structure' needs --docs markdown")
     ap.add_argument("--judge-model", default=JUDGE_MODEL)
     ap.add_argument("--run-name")
     ap.add_argument("--limit", type=int, help="only the first N records (quick test)")
     ap.add_argument("--retrieval-only", action="store_true")
     ap.add_argument("--no-judge", action="store_true")
     a = ap.parse_args()
-    settings = rag.Settings(model=a.model, k=a.k, retriever=a.retriever, docs=a.docs)
+    settings = rag.Settings(model=a.model, k=a.k, retriever=a.retriever, docs=a.docs, chunking=a.chunking)
     table, summary, counts = evaluate(settings, a.version, a.run_name, a.retrieval_only, not a.no_judge, a.judge_model, a.limit)
     pd.set_option("display.width", 200, "display.max_colwidth", 70)
     cols = [c for c in ["id", "expected", "error_type", "hit", "verdict", "faithfulness", "reason"] if c in table]

@@ -4,6 +4,7 @@
     python rag.py "..." --model qwen/qwen3.5-9b --k 8
     python rag.py "..." --retriever embed
     python rag.py "..." --docs markdown       # the Markdown versions of the PDFs (guidelines_md/)
+    python rag.py "..." --docs markdown --chunking structure   # passages follow headings, not pages
 
 How it works, in three steps:
   1. **Index** (once): read the guideline PDFs, cut each page into overlapping passages of
@@ -59,13 +60,17 @@ class Settings:
     temperature: float = 0.0                       # as repeatable as the provider allows
     thinking: bool = False                         # "reasoning" models think before answering: slower, costlier
     docs: str = "pdf"                              # "pdf" (text pulled from the PDFs) or "markdown" (guidelines_md/)
+    chunking: str = "fixed"                        # "fixed" (word windows, one page at a time) or "structure" (markdown)
+
+
+CHUNKINGS = ["fixed", "structure"]                 # "semantic" (split inside sections by meaning) would go here
 
 
 def run_params(settings):
-    """The settings as saved with a run. `docs` was added later: runs on the PDFs keep their saved key."""
+    """The settings as saved with a run. `docs` and `chunking` were added later: runs on the PDFs keep their key."""
     params = asdict(settings)
     if params["docs"] == "pdf":
-        del params["docs"]
+        del params["docs"], params["chunking"]
     return params
 
 
@@ -112,7 +117,8 @@ def make_passages(pages, chunk_words=200, overlap_words=40):
     for p in pages.itertuples():
         words = p.text.split()
         for start in range(0, max(len(words) - overlap_words, 1), step):
-            rows.append({"doc": p.doc, "page": p.page, "text": " ".join(words[start:start + chunk_words])})
+            rows.append({"doc": p.doc, "page": p.page, "end_page": p.page,
+                         "text": " ".join(words[start:start + chunk_words])})
     passages = pd.DataFrame(rows)
     passages.insert(0, "passage_id", [f"{d}:p{pg}:{i}" for i, (d, pg) in enumerate(zip(passages.doc, passages.page))])
     return passages
@@ -178,66 +184,198 @@ def flowchart_text(block):
     return "\n".join(lines)
 
 
-def make_markdown_passages(folder=DOCS_MD, chunk_words=200, overlap_words=40):
-    """Passages from the Markdown files: cut at headings and page breaks, never inside a table or a figure.
+def markdown_pages(folder=DOCS_MD):
+    """One row per page of the Markdown files, like load_pages() for the PDFs: for fixed-window chunking."""
+    rows = []
+    for f in sorted(Path(folder).glob("*.md")):
+        by_page = {}
+        for p, kind, text in markdown_blocks(f.read_text()):
+            by_page.setdefault(p, []).append(flowchart_text(text) if kind == "figure" else text)
+        for p, texts in by_page.items():
+            text = re.sub(r"\s+", " ", " ".join(texts)).strip()
+            if len(text.split()) >= 20:
+                rows.append({"doc": f.stem, "page": p, "text": text})
+    if not rows:
+        raise FileNotFoundError(f"no Markdown files in {folder}")
+    return pd.DataFrame(rows)
 
-    A heading starts a new passage unless the passage so far is short (under half of chunk_words): then the
-    small sections are packed together, as tiny passages crowd the keyword search. A passage that does not start
-    with a heading gets its section's heading on top, so a table keeps the heading that says what it is.
-    A passage never crosses pages (citations stay exact, as with the PDFs); a table or figure longer than
-    chunk_words stays whole; a long paragraph is cut into overlapping pieces as on the PDF side.
+
+def table_cells(row):
+    row = row.strip()
+    return [c.strip() for c in row[row.startswith("|"):len(row) - row.endswith("|")].split("|")]
+
+
+def continues(prev, table):
+    """Is `table`, at the top of a page, the rest of `prev`, which ended the page before? Then the rows to append.
+
+    Only if it has as many columns, and either repeats prev's header (dropped) or has no header of its own:
+    LlamaParse then promotes the first data row to header, recognisable as a row that starts lower-case or with
+    a bullet, has a number, an empty or a long (9+ words) cell, or carries on a list of abbreviations. A row that
+    names a table ("Reference Table for ...") is a new table. A header reworded on the new page is not recognised:
+    those tables stay apart, which is safe, only less tidy."""
+    lines, prev_lines = table.splitlines(), prev.splitlines()
+    head, prev_head = table_cells(lines[0]), table_cells(prev_lines[0])
+    if len(head) != len(prev_head):
+        return None
+    if [c.lower() for c in head] == [c.lower() for c in prev_head]:
+        return lines[2:]
+    acronym = re.compile(r"[A-Z][A-Z0-9-]{1,9}")
+    if any(re.search(r"\btable\b", c, re.I) for c in head):
+        return None
+    data_like = (re.match(r"[a-z]|\\?\*|•", head[0] or " ")
+                 or any(not c or re.match(r"[<>≤≥]?\s*\d", c) or len(c.split()) > 8 for c in head)
+                 or (acronym.fullmatch(head[0]) and acronym.fullmatch(table_cells(prev_lines[-1])[0])))
+    return [lines[0]] + lines[2:] if data_like else None
+
+
+FOOTNOTE = re.compile(r"(\\?\*|<sup>|\d+\s*<sup>)")
+
+
+def merge_continued_tables(blocks):
+    """Blocks as dicts with a page range; a table carried over a page break becomes one table (footnotes at the
+    bottom of the first page, which sit between the two parts, move below it)."""
+    out = []
+    for p, kind, text in blocks:
+        if kind == "table" and out:
+            first_on_page = out[-1]["end"] < p
+            back = len(out) - 1
+            while back >= 0 and out[back]["kind"] == "text" and FOOTNOTE.match(out[back]["text"]) \
+                    and out[back]["end"] == p - 1 and len(out) - back <= 3:
+                back -= 1
+            prev = out[back] if back >= 0 else None
+            rows = continues(prev["text"], text) if first_on_page and prev and prev["kind"] == "table" \
+                and prev["end"] == p - 1 else None
+            if rows is not None:
+                prev["text"] += "\n" + "\n".join(rows)
+                prev["end"] = p
+                continue
+        out.append({"start": p, "end": p, "kind": kind, "text": text})
+    return out
+
+
+def heading_title(line):
+    return re.sub(r"\*\*|<[^>]+>", "", line.lstrip("#")).strip()
+
+
+ROMAN = re.compile(r"[IVX]+[\s.:)]+[A-Z]")         # "IV Strategies" (case matters: "ii) Case definitions" is a list)
+NUMBER = re.compile(r"(\d+(?:\.\d+)*)\.?(?:\s|$)")
+
+
+def heading_levels(headings):
+    """Nesting depth of each heading line of one document.
+
+    LlamaParse's #-levels are unreliable (an annex under another annex, the front matter's "Contents" above
+    chapter 4); the printed numbering is not: "7.4" is 2, "7.4.1" is 3, "Annex 4" and "Chapter VI" are 1. A single
+    number ("7.") is a chapter if the next dotted number after it is "7.x" or its title is in capitals; otherwise it is a numbered list
+    item set as a heading ("11 Perinatal death", "2. Multibacillary Leprosy"). Where chapters are roman (I, II, ...)
+    those are level 1. An unnumbered heading sits below the numbered section it is in, ordered by its #-level."""
+    titles = [heading_title(h) for h in headings]
+    numbers = [NUMBER.match(t).group(1) if NUMBER.match(t) else None for t in titles]
+    roman = sum(bool(ROMAN.match(t)) for t in titles) >= 3
+    levels = []
+    for i, (line, title, number) in enumerate(zip(headings, titles, numbers)):
+        if re.match(r"(annex|appendix|chapter|part)\s+[\divxlc]+\b", title, re.I) or (roman and ROMAN.match(title)):
+            levels.append(1)
+        elif number and "." in number:
+            levels.append(number.count(".") + 1)
+        elif number and (next((n for n in numbers[i + 1:] if n and "." in n), "").split(".")[0] == number
+                         or title.isupper()):
+            levels.append(1)
+        else:
+            levels.append(10 + len(line) - len(line.lstrip("#")))
+    return levels
+
+
+def make_structure_passages(folder=DOCS_MD, chunk_words=200, overlap_words=40):
+    """Passages that follow the document's structure, not its pages.
+
+    A section (a heading and what follows, up to the next heading) is one passage if it fits in chunk_words;
+    a longer one is cut at paragraph breaks (then line breaks; word windows only for a single huge line); small
+    sections are packed together with the next. A table or figure is never cut, and a table continued on the next
+    page is first joined into one. Each passage starts with its heading path ("4 Treatment > 4.2 Plan C") and
+    keeps the range of PDF pages it covers (page .. end_page) for citations.
     """
     files = sorted(Path(folder).glob("*.md"))
     if not files:
         raise FileNotFoundError(f"no Markdown files in {folder}")
     rows, step = [], chunk_words - overlap_words
     for f in files:
-        heading, current, page = "", [], None
+        blocks = merge_continued_tables(markdown_blocks(f.read_text()))
+        levels = iter(heading_levels([b["text"] for b in blocks if b["kind"] == "heading"]))
+        doc_rows, path, current, passage_path = [], [], [], ""
 
         def words():
-            return sum(len(c.split()) for c in current)
+            return sum(len(b["text"].split()) for b in current)
 
         def flush():
-            body = "\n\n".join(current).strip()
-            if len(body.split()) >= 5:
-                text = body if HEADING.match(body) or not heading else f"{heading}\n\n{body}"
-                rows.append({"doc": f.stem, "page": page, "text": text})
+            if current and words() >= 5:
+                body = "\n\n".join(b["text"] for b in current)
+                doc_rows.append({"doc": f.stem, "page": min(b["start"] for b in current),
+                                 "end_page": max(b["end"] for b in current),
+                                 "text": f"{passage_path}\n\n{body}" if passage_path else body, "n": words()})
             current.clear()
 
-        for p, kind, text in markdown_blocks(f.read_text()):
-            if p != page:
+        def add(block, can_split_before=True):
+            nonlocal passage_path
+            n = len(block["text"].split())
+            if current and words() + n > chunk_words and (block["kind"] == "text" or words() >= chunk_words // 2) \
+                    and can_split_before:
                 flush()
-                page = p
-            if kind == "figure":
-                text = flowchart_text(text)
-            n = len(text.split())
-            if kind == "heading":
+            if not current:
+                passage_path = " > ".join(t for _, t in path if t)
+            current.append(block)
+
+        for b in blocks:
+            if b["kind"] == "heading":
+                level = next(levels)
+                while path and path[-1][0] >= level:
+                    path.pop()
+                path.append((level, heading_title(b["text"])))
                 if words() >= chunk_words // 2:
                     flush()
-                if not current:
-                    heading = text
-            elif kind == "text" and n > chunk_words:          # a long paragraph or list: pieces, line by line
-                if words() >= chunk_words // 2:
-                    flush()
-                for line in text.splitlines():
-                    w = line.split()
-                    if len(w) > chunk_words:                   # one very long line: overlapping word windows
-                        flush()
-                        for start in range(0, max(len(w) - overlap_words, 1), step):
-                            current.append(" ".join(w[start:start + chunk_words]))
-                            flush()
-                    else:
-                        if words() + len(w) > chunk_words:
-                            flush()
-                        current.append(line)
+                if current:                          # a small section packed with this one: keep its heading
+                    current.append(b)
                 continue
-            elif current and words() + n > chunk_words and (kind == "text" or words() >= chunk_words // 2):
-                flush()                     # but a table or figure stays with a short lead-in (its caption)
-            current.append(text)
+            if b["kind"] == "figure":
+                b = dict(b, text=flowchart_text(b["text"]))
+            if b["kind"] == "text" and len(b["text"].split()) > chunk_words:     # a long paragraph or list
+                for line in b["text"].splitlines():
+                    w = line.split()
+                    if len(w) > chunk_words:
+                        for start in range(0, max(len(w) - overlap_words, 1), step):
+                            flush()
+                            add(dict(b, text=" ".join(w[start:start + chunk_words])))
+                    elif w:
+                        add(dict(b, text=line))
+                continue
+            add(b)
         flush()
-    passages = pd.DataFrame(rows)
+        for r in doc_rows:                            # a tiny leftover joins the passage before it
+            if r["n"] < 30 and rows and rows[-1]["doc"] == r["doc"]:
+                prev = rows[-1]
+                prev["text"] += "\n\n" + r["text"].split("\n\n", 1)[-1]
+                prev["end_page"] = max(prev["end_page"], r["end_page"])
+                prev["page"] = min(prev["page"], r["page"])
+                prev["n"] += r["n"]
+            else:
+                rows.append(r)
+    passages = pd.DataFrame(rows).drop(columns="n")
     passages.insert(0, "passage_id", [f"{d}:p{pg}:{i}" for i, (d, pg) in enumerate(zip(passages.doc, passages.page))])
     return passages
+
+
+def page_label(page, end_page):
+    return f"page {page}" if page == end_page else f"pages {page}–{end_page}"
+
+
+def source_ids(hits):
+    """doc:p28 or doc:p28-29, one per passage: what a run saves as its sources."""
+    return [f"{d}:p{p}" + (f"-{e}" if e != p else "") for d, p, e in zip(hits.doc, hits.page, hits.end_page)]
+
+
+def on_pages(hits, doc, pages):
+    """For each passage: is it from `doc`, and does its page range include one of `pages`?"""
+    return [d == doc and any(p <= x <= e for x in pages) for d, p, e in zip(hits.doc, hits.page, hits.end_page)]
 
 
 def fingerprint(passages):
@@ -295,11 +433,18 @@ class EmbeddingRetriever:
 def build(settings=Settings(), folder=DOCS):
     """Load (or reuse) the passages for these chunk settings and return a Retriever."""
     INDEX_CACHE.mkdir(exist_ok=True)
+    if settings.chunking not in CHUNKINGS or (settings.docs == "pdf" and settings.chunking != "fixed"):
+        raise ValueError(f"chunking {settings.chunking!r}: choose from {CHUNKINGS}; 'structure' needs docs='markdown'")
     cache = INDEX_CACHE / f"passages_{settings.chunk_words}_{settings.overlap_words}.parquet"
-    if settings.docs == "markdown":      # a second's work: rebuilt every time, so an edited file is never stale
-        passages = make_markdown_passages(DOCS_MD, settings.chunk_words, settings.overlap_words)
+    # the Markdown passages are a second's work: rebuilt every time, so an edited file is never stale
+    if settings.docs == "markdown" and settings.chunking == "structure":
+        passages = make_structure_passages(DOCS_MD, settings.chunk_words, settings.overlap_words)
+    elif settings.docs == "markdown":
+        passages = make_passages(markdown_pages(DOCS_MD), settings.chunk_words, settings.overlap_words)
     elif cache.exists():
         passages = pd.read_parquet(cache)
+        if "end_page" not in passages:              # cached before passages had a page range
+            passages["end_page"] = passages.page
     else:
         passages = make_passages(load_pages(folder), settings.chunk_words, settings.overlap_words)
         passages.to_parquet(cache, index=False)
@@ -333,7 +478,8 @@ def thinking_switch(on=False):
 
 
 def format_passages(hits):
-    return "\n\n".join(f"[{i}] ({h.doc}, page {h.page}) {h.text}" for i, h in enumerate(hits.itertuples(), 1))
+    return "\n\n".join(f"[{i}] ({h.doc}, {page_label(h.page, h.end_page)}) {h.text}"
+                       for i, h in enumerate(hits.itertuples(), 1))
 
 
 def answer(question, retriever, settings=Settings(), client=None):
@@ -352,7 +498,7 @@ def answer(question, retriever, settings=Settings(), client=None):
         "question": question,
         "answer": (response.choices[0].message.content or "").strip(),
         "contexts": hits.text.tolist(),
-        "sources": [f"{d}:p{p}" for d, p in zip(hits.doc, hits.page)],
+        "sources": source_ids(hits),
         "seconds": round(time.time() - t0, 2),
         "tokens": getattr(response.usage, "total_tokens", None),
         "settings": run_params(settings),
@@ -366,14 +512,15 @@ def main():
     ap.add_argument("--k", type=int, default=Settings.k)
     ap.add_argument("--retriever", default=Settings.retriever, choices=["tfidf", "embed"])
     ap.add_argument("--docs", default=Settings.docs, choices=["pdf", "markdown"])
+    ap.add_argument("--chunking", default=Settings.chunking, choices=CHUNKINGS, help="'structure' needs --docs markdown")
     ap.add_argument("--search-only", action="store_true", help="show the retrieved passages; no LLM call")
     a = ap.parse_args()
-    s = Settings(model=a.model, k=a.k, retriever=a.retriever, docs=a.docs)
+    s = Settings(model=a.model, k=a.k, retriever=a.retriever, docs=a.docs, chunking=a.chunking)
     retriever = build(s)
     titles = document_titles()
     hits = retriever.search(a.question, s.k)
     for i, h in enumerate(hits.itertuples(), 1):
-        print(f"[{i}] {titles.get(h.doc, h.doc)}, page {h.page} (score {h.score:.3f})\n    {h.text[:220]}...\n")
+        print(f"[{i}] {titles.get(h.doc, h.doc)}, {page_label(h.page, h.end_page)} (score {h.score:.3f})\n    {h.text[:220]}...\n")
     if not a.search_only:
         print(answer(a.question, retriever, s)["answer"])
 

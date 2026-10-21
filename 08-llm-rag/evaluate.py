@@ -6,6 +6,7 @@
     python evaluate.py --retrieval-only                  # no LLM at all: only checks the search step
     python evaluate.py --retrieval-only --retriever embed   # the same, with the embedding retriever
     python evaluate.py --retrieval-only --docs markdown  # the same, on the Markdown versions of the PDFs
+    python evaluate.py --retrieval-only --docs markdown --chunking structure   # passages follow headings, not pages
     python evaluate.py --no-judge                        # answers + rule checks, skip the Ragas judge
 
 Three layers of evaluation, cheapest first:
@@ -55,11 +56,12 @@ def load_questions(path=QUESTIONS):
 
 
 def retrieval_checks(questions, retriever, k):
-    """For each answerable question: is a passage from the right document and page among the top k?"""
+    """For each answerable question: is a passage from the right document and page among the top k?
+    (A passage that spans pages counts if the page is in its range.)"""
     rows = []
     for q in questions.itertuples():
         hits = retriever.search(q.question, k)
-        right = [(d == q.doc and p in q.page_list) for d, p in zip(hits.doc, hits.page)]
+        right = rag.on_pages(hits, q.doc, q.page_list)
         rows.append({"id": q.id, "hit": any(right) if q.doc else None,
                      "first_right_rank": (right.index(True) + 1) if any(right) else None})
     return pd.DataFrame(rows)
@@ -199,6 +201,7 @@ def main():
     ap.add_argument("--k", type=int, default=rag.Settings.k)
     ap.add_argument("--retriever", default=rag.Settings.retriever, choices=["tfidf", "embed"])
     ap.add_argument("--docs", default=rag.Settings.docs, choices=["pdf", "markdown"])
+    ap.add_argument("--chunking", default=rag.Settings.chunking, choices=rag.CHUNKINGS, help="'structure' needs --docs markdown")
     ap.add_argument("--chunk-words", type=int, default=rag.Settings.chunk_words)
     ap.add_argument("--prompt", default=rag.Settings.prompt_version, choices=list(rag.PROMPTS))
     ap.add_argument("--judge-model", default=JUDGE_MODEL)
@@ -208,7 +211,7 @@ def main():
     ap.add_argument("--no-judge", action="store_true")
     a = ap.parse_args()
     settings = rag.Settings(model=a.model, k=a.k, chunk_words=a.chunk_words, prompt_version=a.prompt, retriever=a.retriever,
-                            docs=a.docs)
+                            docs=a.docs, chunking=a.chunking)
     table, summary = evaluate(settings, a.run_name, a.retrieval_only, not a.no_judge, a.judge_model, a.limit)
     pd.set_option("display.width", 200, "display.max_colwidth", 60)
     cols = [c for c in ["id", "type", "hit", "first_right_rank", "cites_a_passage", "refusal_correct",

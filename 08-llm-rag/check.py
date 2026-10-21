@@ -201,7 +201,7 @@ def check(r, retriever, settings=rag.Settings(), version="v2", client=None):
                         f"Passages:\n\n{passages}\n\n{patient(r)}\nDrug: {r.drug} (amounts in {r.unit})")
         verdict, reason = compare(r, rule, hits.text.tolist()) if rule else ("", raw)
     return {"id": r.id, "verdict": verdict, "reason": reason, "rule": rule, "raw": raw,
-            "contexts": hits.text.tolist(), "sources": [f"{d}:p{p}" for d, p in zip(hits.doc, hits.page)],
+            "contexts": hits.text.tolist(), "sources": rag.source_ids(hits),
             "version": version, "settings": rag.run_params(settings)}
 
 
@@ -213,8 +213,9 @@ def main():
     ap.add_argument("--k", type=int, default=K)
     ap.add_argument("--retriever", default=RETRIEVER, choices=["tfidf", "embed"])
     ap.add_argument("--docs", default=rag.Settings.docs, choices=["pdf", "markdown"])
+    ap.add_argument("--chunking", default=rag.Settings.chunking, choices=rag.CHUNKINGS, help="'structure' needs --docs markdown")
     a = ap.parse_args()
-    s = rag.Settings(model=a.model, k=a.k, retriever=a.retriever, docs=a.docs)
+    s = rag.Settings(model=a.model, k=a.k, retriever=a.retriever, docs=a.docs, chunking=a.chunking)
     r = next(load_records().query("id == @a.record").itertuples())
     out = check(r, rag.build(s), s, a.version)
     print(f"{patient(r)}\nPrescription: {r.prescription}\n\nPassages: {', '.join(out['sources'])}")
