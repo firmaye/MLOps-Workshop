@@ -4,6 +4,7 @@
     python evaluate.py --model qwen/qwen3.5-9b --run-name "smaller model"
     python evaluate.py --k 2 --run-name "fewer passages"
     python evaluate.py --retrieval-only                  # no LLM at all: only checks the search step
+    python evaluate.py --retrieval-only --retriever embed   # the same, with the embedding retriever
     python evaluate.py --no-judge                        # answers + rule checks, skip the Ragas judge
 
 Three layers of evaluation, cheapest first:
@@ -67,7 +68,10 @@ def retrieval_checks(questions, retriever, k):
 
 
 def run_key(settings, n_questions):
-    blob = json.dumps(asdict(settings), sort_keys=True) + rag.PROMPTS[settings.prompt_version] + str(n_questions)
+    params = asdict(settings)
+    if params["retriever"] == "tfidf":       # added later: answers saved before the switch existed keep their key
+        del params["retriever"]
+    blob = json.dumps(params, sort_keys=True) + rag.PROMPTS[settings.prompt_version] + str(n_questions)
     return hashlib.md5(blob.encode()).hexdigest()[:10]
 
 
@@ -179,7 +183,7 @@ def evaluate(settings=rag.Settings(), run_name=None, retrieval_only=False, judge
             mlflow.log_params(asdict(settings) | {
                 "index_fingerprint": rag.fingerprint(retriever.passages),
                 "n_questions": len(questions), "judge_model": judge_model if judge and not retrieval_only else "-",
-                "retriever": "tfidf-1-2gram"})
+                "retriever_detail": "tfidf-1-2gram" if settings.retriever == "tfidf" else rag.EMBED_MODEL})
             mlflow.log_text(rag.PROMPTS[settings.prompt_version], "prompt.txt")
             mlflow.log_metrics({k: float(v) for k, v in summary.items()})
             mlflow.log_table(table.astype(str), "per_question.json")
@@ -192,6 +196,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--model", default=rag.Settings.model)
     ap.add_argument("--k", type=int, default=rag.Settings.k)
+    ap.add_argument("--retriever", default=rag.Settings.retriever, choices=["tfidf", "embed"])
     ap.add_argument("--chunk-words", type=int, default=rag.Settings.chunk_words)
     ap.add_argument("--prompt", default=rag.Settings.prompt_version, choices=list(rag.PROMPTS))
     ap.add_argument("--judge-model", default=JUDGE_MODEL)
@@ -200,7 +205,7 @@ def main():
     ap.add_argument("--retrieval-only", action="store_true")
     ap.add_argument("--no-judge", action="store_true")
     a = ap.parse_args()
-    settings = rag.Settings(model=a.model, k=a.k, chunk_words=a.chunk_words, prompt_version=a.prompt)
+    settings = rag.Settings(model=a.model, k=a.k, chunk_words=a.chunk_words, prompt_version=a.prompt, retriever=a.retriever)
     table, summary = evaluate(settings, a.run_name, a.retrieval_only, not a.no_judge, a.judge_model, a.limit)
     pd.set_option("display.width", 200, "display.max_colwidth", 60)
     cols = [c for c in ["id", "type", "hit", "first_right_rank", "cites_a_passage", "refusal_correct",

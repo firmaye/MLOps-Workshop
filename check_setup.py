@@ -34,6 +34,7 @@ PACKAGES = {
     "dvc": "dvc", "great-expectations": "great_expectations", "mlflow": "mlflow",
     "fairlearn": "fairlearn", "evidently": "evidently", "prefect": "prefect",
     "onnxruntime": "onnxruntime", "pillow": "PIL", "openai": "openai", "ipykernel": "ipykernel",
+    "fastembed": "fastembed",
 }
 
 results = []   # (status, item, detail)

@@ -2,11 +2,13 @@
 
     python rag.py "What is the community case definition of suspected cholera?"
     python rag.py "..." --model qwen/qwen3.5-9b --k 8
+    python rag.py "..." --retriever embed
 
 How it works, in three steps:
   1. **Index** (once): read the guideline PDFs, cut each page into overlapping passages of
      about 200 words, and build a keyword index (TF-IDF) over them.
-  2. **Retrieve**: for a question, find the k passages that share the most (rare) words with it.
+  2. **Retrieve**: for a question, find the k passages that share the most (rare) words with it, or, with
+     `--retriever embed`, the k passages closest in meaning (a small embedding model).
   3. **Generate**: send the question plus those passages to an LLM, with instructions to answer
      only from them, cite them as [1], [2] ..., and say so when the answer isn't there.
 
@@ -37,6 +39,7 @@ DOCS = REPO / "downloads" / "guidelines"          # filled by: python scripts/do
 INDEX_CACHE = HERE / "index"                      # passages, cached after the first run
 
 OPENROUTER = "https://openrouter.ai/api/v1"
+EMBED_MODEL = "BAAI/bge-small-en-v1.5"            # 67 MB, English; runs on onnxruntime via fastembed (no PyTorch)
 REFUSAL = "The guidelines provided do not cover this."
 
 logging.getLogger("pypdf").setLevel(logging.ERROR)   # some PDFs trigger harmless parser warnings
@@ -46,6 +49,7 @@ logging.getLogger("pypdf").setLevel(logging.ERROR)   # some PDFs trigger harmles
 class Settings:
     """Everything that defines one version of the assistant. Logged with every evaluation run."""
     model: str = "google/gemma-4-26b-a4b-it"      # open-weight (Apache-2.0), hosted on OpenRouter
+    retriever: str = "tfidf"                       # "tfidf" (shared words) or "embed" (meaning, EMBED_MODEL)
     k: int = 5                                     # passages given to the model
     chunk_words: int = 200                         # passage length
     overlap_words: int = 40                        # overlap between consecutive passages
@@ -111,7 +115,7 @@ def fingerprint(passages):
 class Retriever:
     """Keyword search (TF-IDF with word pairs). Simple, fast, no extra model to download.
 
-    A dense "embedding" retriever finds paraphrases better; swapping it in is a good exercise.
+    A dense "embedding" retriever (below) finds paraphrases better, and is weaker on exact words: drug names, doses.
     """
 
     def __init__(self, passages):
@@ -127,6 +131,34 @@ class Retriever:
         return self.passages.iloc[top].assign(score=scores[top])
 
 
+class EmbeddingRetriever:
+    """Dense search: passages and question become vectors from a small embedding model; the nearest vectors win.
+
+    Finds passages that say the same thing in other words. The model downloads on first use; embedding all
+    passages takes a few minutes on a laptop CPU, once: the vectors are cached in index/.
+    """
+
+    def __init__(self, passages, model=EMBED_MODEL):
+        from fastembed import TextEmbedding
+
+        self.passages = passages.reset_index(drop=True)
+        self.model = TextEmbedding(model, cache_dir=str(INDEX_CACHE / "models"))
+        cache = INDEX_CACHE / f"vectors_{model.split('/')[-1]}_{fingerprint(self.passages)}.npy"
+        if cache.exists():
+            self.matrix = np.load(cache)
+        else:
+            print(f"embedding {len(self.passages)} passages with {model} (once; a few minutes)...", flush=True)
+            m = np.array(list(self.model.passage_embed(self.passages.text.tolist())))
+            self.matrix = m / np.linalg.norm(m, axis=1, keepdims=True)
+            np.save(cache, self.matrix)
+
+    def search(self, question, k=5):
+        q = np.array(next(iter(self.model.query_embed([question]))))
+        scores = self.matrix @ (q / np.linalg.norm(q))
+        top = np.argsort(-scores)[:k]
+        return self.passages.iloc[top].assign(score=scores[top])
+
+
 def build(settings=Settings(), folder=DOCS):
     """Load (or reuse) the passages for these chunk settings and return a Retriever."""
     INDEX_CACHE.mkdir(exist_ok=True)
@@ -136,7 +168,7 @@ def build(settings=Settings(), folder=DOCS):
     else:
         passages = make_passages(load_pages(folder), settings.chunk_words, settings.overlap_words)
         passages.to_parquet(cache, index=False)
-    return Retriever(passages)
+    return EmbeddingRetriever(passages) if settings.retriever == "embed" else Retriever(passages)
 
 
 # ---------------------------------------------------------------- 2-3. retrieve and generate
@@ -197,9 +229,10 @@ def main():
     ap.add_argument("question")
     ap.add_argument("--model", default=Settings.model)
     ap.add_argument("--k", type=int, default=Settings.k)
+    ap.add_argument("--retriever", default=Settings.retriever, choices=["tfidf", "embed"])
     ap.add_argument("--search-only", action="store_true", help="show the retrieved passages; no LLM call")
     a = ap.parse_args()
-    s = Settings(model=a.model, k=a.k)
+    s = Settings(model=a.model, k=a.k, retriever=a.retriever)
     retriever = build(s)
     titles = document_titles()
     hits = retriever.search(a.question, s.k)

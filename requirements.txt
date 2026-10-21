@@ -16,6 +16,7 @@ pillow                       # TB X-ray demo: reading and resizing images
 openai>=1.50                 # LLM demo: client for Ollama's OpenAI-compatible API (no OpenAI account needed)
 cryptography<49               # indirect (via evidently, prefect); 49+ dropped Intel-Mac wheels
 ragas>=0.4,<0.5             # LLM demo: evaluating retrieval-augmented answers
+fastembed>=0.7,<0.10           # LLM demo: embedding retriever on onnxruntime (no PyTorch); --retriever embed
 pypdf                        # LLM demo: reading guideline PDFs
 langchain-community<0.4      # indirect (via ragas); 0.4 removed a module ragas 0.4.3 imports
 kagglehub                    # TB demo: downloads the Zambia study metadata from Kaggle (no account needed for public data)
