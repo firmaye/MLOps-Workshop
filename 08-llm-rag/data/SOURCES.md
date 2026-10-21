@@ -75,43 +75,65 @@ table (bedaquiline in Annex 6) sit in the first value column; a heading carries 
 has none of its own (acute malnutrition p25 is under "Hospital Level" from p24). The documents contain no Amharic
 text: Amharic only enters through two questions in `eval_questions.csv`.
 
-## Retrieval and the prescription check, PDF vs Markdown (2026-10-21)
+## Chunking, PDF vs Markdown (2026-10-21)
 
-Retrieval only, no LLM: `python evaluate.py --retrieval-only [--retriever embed] --docs pdf|markdown` (right page
-among k=5 passages, 22 answerable questions) and `python evaluate_check.py --retrieval-only ...` (right page among
-k=8, 43 records with a page).
+Two ways to cut the text into passages, set by `--chunking` (rag.py):
 
-| | eval, keywords | eval, embeddings | check, keywords | check, embeddings |
-|---|---|---|---|---|
-| PDF (2,163 passages) | 17 of 22 | 16 of 22 | 35 of 43 | 41 of 43 |
-| Markdown, first loader (cut at every heading; 1,815 passages) | 14 of 22 | 15 of 22 | 34 of 43 | 39 of 43 |
-| Markdown, rag.py now (small sections packed, flowcharts as plain lines; 1,464 passages) | 17 of 22 | 16 of 22 | 35 of 43 | 39 of 43 |
+- **fixed**: overlapping windows of 200 words (40 overlap) within one page, as the lesson does with the PDFs.
+  On the Markdown, the same windows run over each page's Markdown text.
+- **structure** (Markdown only): passages follow the headings, across page breaks. A section that fits in 200
+  words is one passage; a longer one is cut at paragraph breaks; small sections are packed with the next. A table
+  is never cut, and a table continued on the next page is first joined into one (27 joins: the F-75 and F-100
+  annexes, glossaries, the TB adverse-event grading table, among others; a continuation whose header is
+  reworded is left as a separate table). Each passage starts with its heading path
+  ("4. CHOLERA OUTBREAK RESPONSE > 4.2. Case Management > Plan C: ..."), built from the printed section numbers
+  because LlamaParse's heading levels are unreliable. Each passage has a page range (`page`..`end_page`, PDF page
+  index); citations show it ("pages 28–29") and a retrieval hit counts if the expected page is in the range.
+  417 of 1,187 passages span more than one page; mean 189 words, 19 over 400 (whole tables, up to 2,167 words
+  for the F-75 annex: the embedding model reads only its first ~512 tokens).
 
-The first loader's many tiny passages (20–40 words) crowded keyword search. With them packed, Markdown ties PDF;
-the questions it wins and loses differ, both ways, one or two at a time: noise at this size.
+**Retrieval only** (no LLM): right page among k=5 passages for the 22 answerable questions in
+`eval_questions.csv`, and among k=8 for the 43 records with a page in `prescriptions.csv`. "Hit" counts the page
+range; "first page" counts only a passage's first page (a strict lower bound for structure-based passages);
+"pages read" is how many PDF pages the k passages cover on average (more pages = more text for the same k).
 
-Prescription check v2 (default model `google/gemma-4-26b-a4b-it`, embeddings, k=8), one run each;
-`results/check_v2_llm_reads_python_counts.csv` (PDF) and `results/check_v2_llm_reads_python_counts_markdown.csv`:
+| Text | Chunking | Search | Passages | Eval hit | Eval, first page | Pages read | Check hit | Check, first page | Pages read |
+|---|---|---|---|---|---|---|---|---|---|
+| PDF | fixed | keyword | 2,163 | 17/22 | 17/22 | 5.0 | 35/43 | 35/43 | 8.0 |
+| PDF | fixed | embedding | 2,163 | 16/22 | 16/22 | 5.0 | 41/43 | 41/43 | 8.0 |
+| Markdown | fixed | keyword | 1,508 | 16/22 | 16/22 | 5.0 | 34/43 | 34/43 | 8.0 |
+| Markdown | fixed | embedding | 1,508 | 18/22 | 18/22 | 5.0 | 40/43 | 40/43 | 8.0 |
+| Markdown | structure | keyword | 1,187 | **20/22** | 16/22 | 6.9 | **41/43** | 38/43 | 10.3 |
+| Markdown | structure | embedding | 1,187 | 16/22 | 13/22 | 7.0 | **41/43** | 39/43 | 10.6 |
 
-| | PDF | Markdown |
-|---|---|---|
-| errors caught | 12 of 22 | **17 of 22** |
-| correct passed | 13 of 21 | 14 of 21 |
-| false alarms | 2 of 21 | 3 of 21 |
-| 'unsure' (sent to a person) | 13 of 44 | **6 of 44** |
-| said 'not covered' on a covered record | 1 of 43 | 0 of 43 |
-| verdict = expected | 26 of 44 | 32 of 44 |
-| faithfulness (Ragas judge) | 0.24 (44 scored) | 0.22, **only 17 of 44 scored** |
+The text alone (PDF vs Markdown, both fixed) moves retrieval by a question or two either way: noise at this
+size. Structure-based chunks with keyword search find the right page most often, but part of that is the range
+rule and the extra pages read (6.9 vs 5 per question); counted by first page only, they are no better. Embedding
+search gains nothing from structure, plausibly because long passages are truncated before embedding.
 
-What changed, record by record (19 of 44 verdicts differ): the isoniazid records rx36–rx40 were all "unsure" on
-the PDF (the LLM's quote of the flattened weight-band table failed the grounding test); from a Markdown table row
-the quote passes, and all five are now right. rx11, rx13, rx16 and rx25 are now caught; rx35 now passes. New
-problems on Markdown: three false alarms from wrong extractions: rx10 "over 30 minutes" taken as `over_hours` 30,
-rx17 the ORS rule for a different situation (every hour), rx22 amoxicillin's `n_doses` 1. rx07–rx09 extract
-azithromycin "20 mg/kg (max 1 g)" as maximum 1, a g/mg slip that Python flags as inconsistent ("unsure"). rx34 and
-rx42 now pass a wrong prescription (rx34: the rule came back with a maximum and no minimum, so no amount was
-compared; rx42: the general 10 mg/kg rule instead of the under-five restriction). rx29's reply holds two JSON
-objects (a self-correction), which `check.parse()` cannot read, so its verdict is empty. One run each, so part of
-this is the model's run-to-run variation. The judge failed on 27 records with OpenRouter error 402: the account had
-no credit loaded (the $0.19 spent so far was all its usage), and OpenRouter reserves the worst-case cost of each
-in-flight request (the judge allows 8,192 output tokens, 4 at a time). Credit has since been added.
+**Prescription check v2** (default model `google/gemma-4-26b-a4b-it`, embeddings, k=8, judge `openai/gpt-oss-120b`),
+one run each; per record in `results/check_v2_llm_reads_python_counts*.csv`:
+
+| | PDF, fixed | Markdown, fixed | Markdown, structure |
+|---|---|---|---|
+| right page among the passages | 41/43 | 40/43 | 41/43 |
+| errors caught | 12 of 22 | 15 of 22 | **17 of 22** |
+| correct passed | 13 of 21 | 12 of 21 | **15 of 21** |
+| false alarms | 2 of 21 | 3 of 21 | 3 of 21 |
+| 'unsure' (sent to a person) | 13 of 44 | 7 of 44 | **6 of 44** |
+| verdict = expected | 26 of 44 | 28 of 44 | **33 of 44** |
+| empty verdict (reply not parseable) | 0 | 3 | 1 |
+| faithfulness (Ragas judge, 44 scored) | 0.24 | 0.24 | 0.33 |
+
+Most of the Markdown gain is the table-based records: on the PDF the LLM's quote from a flattened table (the
+isoniazid weight bands, rx36–rx40) fails the grounding test and the verdict is "unsure"; quoted from a Markdown
+table row it passes. Structure-based chunks add a few more right verdicts, as a dosing rule and its table now
+arrive in one passage. One run per configuration, so a difference of one or two records is within the model's
+run-to-run variation. Recurring extraction errors on Markdown: a time in minutes taken as hours (rx10), azithromycin's
+"max 1 g" taken as 1 (mg), the general isoniazid rule used instead of the under-five restriction (rx42); replies
+with two JSON objects (a self-correction) leave `check.parse()` with no verdict.
+
+An earlier Markdown loader (page-bounded, cut at headings; replaced by the two above) is kept in
+`results/check_v2_llm_reads_python_counts_markdown.csv` for the record: 17/22 caught, 6/44 unsure; its judge scored
+only 17 of 44 records (OpenRouter 402: the account had no credit loaded, and OpenRouter reserves the worst-case
+cost of each in-flight request; the judge allows 8,192 output tokens, 4 at a time). Credit has since been added.
