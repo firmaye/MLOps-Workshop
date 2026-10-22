@@ -6,17 +6,17 @@ EMR data.
 
 | # | Topic | Folder |
 |---|-------|--------|
-| 0 | Mock EMR data + drift scenarios; [notebook](00-data/explore_data.ipynb) to explore it | [`00-data/`](00-data/) |
-| 1 | DVC: data, model and pipeline versioning ([cheat sheet](01-dvc/DVC_CHEATSHEET.md)) | [`01-dvc/`](01-dvc/) |
-| 2 | Great Expectations: data validation as a pipeline gate | [`02-great-expectations/`](02-great-expectations/) |
-| 3 | MLflow: experiment tracking, model registry, serving | [`03-mlflow/`](03-mlflow/) |
-| 4 | Fairlearn: who does the model miss? Per-group metrics, causes, mitigation | [`04-fairlearn/`](04-fairlearn/) |
-| 5 | Evidently: data drift, prediction drift, performance monitoring | [`05-evidently/`](05-evidently/) |
-| 6 | Prefect: the monthly pipeline that runs all of the above | [`06-prefect/`](06-prefect/) |
+| 0 | Mock EMR data + drift scenarios; [notebook](malnutrition/00-data/explore_data.ipynb) to explore it | [`malnutrition/00-data/`](malnutrition/00-data/) |
+| 1 | DVC: data, model and pipeline versioning ([cheat sheet](malnutrition/01-dvc/DVC_CHEATSHEET.md)) | [`malnutrition/01-dvc/`](malnutrition/01-dvc/) |
+| 2 | Great Expectations: data validation as a pipeline gate | [`malnutrition/02-great-expectations/`](malnutrition/02-great-expectations/) |
+| 3 | MLflow: experiment tracking, model registry, serving | [`malnutrition/03-mlflow/`](malnutrition/03-mlflow/) |
+| 4 | Fairlearn: who does the model miss? Per-group metrics, causes, mitigation | [`malnutrition/04-fairlearn/`](malnutrition/04-fairlearn/) |
+| 5 | Evidently: data drift, prediction drift, performance monitoring | [`malnutrition/05-evidently/`](malnutrition/05-evidently/) |
+| 6 | Prefect: the monthly pipeline that runs all of the above | [`malnutrition/06-prefect/`](malnutrition/06-prefect/) |
 | 7 | Use case: TB chest X-ray screening (Zambia study: acquisition drift vs population shift) | [`07-tb-xray/`](07-tb-xray/) |
 | 8 | Use case: an LLM assistant over the national guidelines: search as a versioned part, Ragas in depth, rubrics graded by people and by a checked judge, a cheaper model through the promotion rule | [`08-llm-rag/`](08-llm-rag/) |
 
-Facilitators: [`FACILITATOR_NOTES.md`](FACILITATOR_NOTES.md) (lessons 00–06, Tuesday); each use case has its own.
+Facilitators: [`malnutrition/FACILITATOR_NOTES.md`](malnutrition/FACILITATOR_NOTES.md) (lessons 00–06, Tuesday); each use case has its own.
 
 ## Where each tool runs: training vs production, centre vs edge
 

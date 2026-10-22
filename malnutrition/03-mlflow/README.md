@@ -34,7 +34,7 @@ creates `mlflow.db` and `mlruns/` in whatever folder you start it from):
 
 ```bash
 source .venv/bin/activate           # Windows: .venv\Scripts\activate
-cd 03-mlflow
+cd malnutrition/03-mlflow
 export MLFLOW_DISABLE_TELEMETRY=true   # optional: MLflow 3 sends anonymous usage data by
                                        #   default (like DVC's analytics); this turns it off
 mlflow ui --port 5000               # leave running; open http://127.0.0.1:5000

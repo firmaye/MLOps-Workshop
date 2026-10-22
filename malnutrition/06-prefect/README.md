@@ -43,7 +43,7 @@ prefect server start
 ```bash
 prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api    # once: talk to that server
 export MLFLOW_DISABLE_TELEMETRY=true DVC_NO_ANALYTICS=1          # optional: no usage data
-cd 06-prefect
+cd malnutrition/06-prefect
 python pipeline.py timeline          # bootstrap + 15 months, ~3 minutes
 ```
 Without a server, Prefect starts a temporary one for each command (slower, no lasting UI).

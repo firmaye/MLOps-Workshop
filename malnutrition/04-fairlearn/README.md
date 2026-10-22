@@ -12,7 +12,7 @@ malnourished but wasn't flagged).
 
 From the repo root, environment active:
 ```bash
-cd 04-fairlearn
+cd malnutrition/04-fairlearn
 ```
 Open `fairness.ipynb` in VSCode (kernel: `.venv`) and run it top to bottom. It reuses the
 MLflow lesson's helper module (`../03-mlflow/emr_model.py`) and generates its own data in

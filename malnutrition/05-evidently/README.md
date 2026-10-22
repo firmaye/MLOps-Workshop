@@ -15,7 +15,7 @@ this data different from what the model learned from?"* and, once outcomes arriv
 
 From the repo root, environment active:
 ```bash
-cd 05-evidently
+cd malnutrition/05-evidently
 ```
 Open `monitoring.ipynb` in VSCode (kernel: `.venv`) and run it. It reuses
 `../03-mlflow/emr_model.py`, trains the 2024 model, and generates 2025 months with the

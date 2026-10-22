@@ -7,7 +7,7 @@ can prioritise follow-up. The data is synthetic, from `../00-data/simulate_emr.p
 (see [`00-data/README.md`](../00-data/README.md); to *look* at the data first,
 open [`00-data/explore_data.ipynb`](../00-data/explore_data.ipynb)).
 
-Before starting, follow the setup in the [main README](../README.md): your own
+Before starting, follow the setup in the [main README](../../README.md): your own
 fork, and a `work` branch. Run everything from inside this `01-dvc/` folder.
 Numbers shown are from a
 verified run; yours should match exactly (the simulator is deterministic).
@@ -82,7 +82,7 @@ cat data/raw.dvc                   # the pointer: one hash for the whole folder 
 git add data/raw.dvc data/.gitignore
 git commit -m "EMR visits Jan-Jun 2024"   # git now records WHICH version of the data, not the data
 
-dvc remote add -d storage ../../dvc-remote    # where `dvc push` sends data; -d = make it the default.
+dvc remote add -d storage ../../../dvc-remote    # where `dvc push` sends data; -d = make it the default.
                                                #   A local folder stands in for S3/GCS/Azure/GDrive
 git add .dvc/config && git commit -m "Add remote"   # the remote's address lives in .dvc/config, in git
 dvc push                           # upload cached data to the remote: "7 files pushed"
@@ -307,7 +307,7 @@ print(dvc.api.params_show(rev="v1")["train"])     # what was v1 trained with?
 print(dvc.api.metrics_show(rev="v1"))             # how did it score?
 
 # file paths are relative to the git root, since this DVC project is in a subfolder
-with dvc.api.open("01-dvc/model.pkl", repo="..", rev="v1", mode="rb") as f:
+with dvc.api.open("malnutrition/01-dvc/model.pkl", repo="../..", rev="v1", mode="rb") as f:
     model_v1 = joblib.load(f)                     # the exact v1 model object
 ```
 `repo` can also be a GitHub URL, given access to the DVC remote.

@@ -3,8 +3,8 @@
 Facilitator: Yoni. Two blocks: 10:45–12:30 (data, DVC, Great Expectations, MLflow tracking) and 14:00–16:30
 (MLflow registry, Fairlearn, Evidently, Prefect). Participants: EAII technical staff; most know modelling, fewer
 know the tools. The use cases on Wednesday–Thursday reuse these tools without re-teaching them, so today has to
-land the tools. Notes for the other use cases: [`07-tb-xray/FACILITATOR_NOTES.md`](07-tb-xray/FACILITATOR_NOTES.md),
-[`08-llm-rag/FACILITATOR_NOTES.md`](08-llm-rag/FACILITATOR_NOTES.md).
+land the tools. Notes for the other use cases: [`07-tb-xray/FACILITATOR_NOTES.md`](../07-tb-xray/FACILITATOR_NOTES.md),
+[`08-llm-rag/FACILITATOR_NOTES.md`](../08-llm-rag/FACILITATOR_NOTES.md).
 
 **The one sentence:** every tool exists to catch a specific failure; one year of a simulated EMR shows each failure
 and the tool that catches it.
