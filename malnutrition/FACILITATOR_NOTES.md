@@ -14,7 +14,7 @@ and the tool that catches it.
 | Clock | Block | Lesson | Notes |
 |---|---|---|---|
 | 10:45–10:55 | The data and the task | 00 | Projector only: the label, leakage, MUAC vs WHZ by sex. PAUSE before section 4 |
-| 10:55–11:35 | DVC | 01, parts 0–3, 8 | Parts 4–7 and 9 optional. Two PAUSEs (v2 better?, the audit) |
+| 10:55–11:35 | DVC | 01, parts 0–3, 8, 10 | Parts 4–7 and 9 optional. Two PAUSEs (v2 better?, the audit) |
 | 11:35–12:05 | Great Expectations | 02, parts 1–3, 6 | The muac_mm teaser from DVC leads in. Parts 4–5 optional |
 | 12:05–12:30 | MLflow tracking | 03, notebook 1 | `mlflow ui` on the projector |
 | 13:30–14:00 | Team presentation 1 | | |
@@ -38,7 +38,7 @@ someone complained"; that's the day's starting point.
 **01 DVC.** Expected: v1 ROC-AUC 0.8022; v2 0.8122 with PPV 0.33 → 0.26; gbm 0.8038 (discard). PAUSE on v2: the
 test set changed too (May–Jun 12% prevalence vs Nov–Dec 9%); diffs compare like with like only on fixed evaluation
 data. PAUSE on the audit: most teams can't answer. Say: "Git stores the pointers, DVC the bytes. Forgetting `dvc
-push` is the #1 mistake." Close with the teaser: muac_mm drops ROC-AUC 0.81 → 0.65 and nothing complains.
+push` is the #1 mistake." Close with Part 10: muac_mm drops ROC-AUC 0.81 → 0.65 and nothing complains.
 
 **02 Great Expectations.** Expected: muac_mm, missing_anthro, messy_export FAIL; new_regions and concept_shift
 PASS. PAUSE answers: most predict muac_mm and messy_export; few predict the passes. Say: "GX asks *is this data

@@ -327,6 +327,24 @@ vanish from the local cache (and Part 8b fails) until you `dvc pull` them back.
 
 ---
 
+## Part 10 – The failure DVC can't see (the bridge to Great Expectations)
+
+Add one broken month and rerun the pipeline:
+```bash
+python ../00-data/simulate_emr.py --start 2025-01 --scenario muac_mm --out data/raw
+dvc add data/raw && dvc repro      # roc_auc 0.81 -> 0.65, and no error anywhere
+```
+The EMR started storing MUAC in mm (137 instead of 13.7). The pipeline ran
+green and produced a much worse model. Nothing stopped it: DVC versions data
+faithfully, but it has no opinion on whether the data is *correct*.
+
+> **PAUSE (2 min).** What should have stopped it, and where in the pipeline?
+
+That is the next lesson ([Great Expectations](../02-great-expectations/README.md)).
+Undo before moving on: `rm data/raw/emr_2025-01.csv && dvc add data/raw && dvc repro`.
+
+---
+
 ## Sharing with a team: remotes and data registries
 
 **Remote** = where `dvc push` puts the bytes. What teams actually use:
@@ -369,22 +387,14 @@ projects use it; everyone can say exactly which release they trained on.
   directory exactly as in Part 1.
 
 ## Teasers for later lessons
+(The broken-MUAC month that leads into Great Expectations is Part 10, above.)
+
 Open `metrics_by_group.json` (sensitivity at one shared threshold):
 - **Girls 0.53 vs boys 0.60.** In the simulator, MUAC reads lower for girls at
   the same WHZ (see the notebook), mirroring field studies where MUAC and WHZ
   disagree more for girls. → Fairlearn.
 - **Addis Ababa: only ~2% of children flagged.** One global threshold, very
   different base rates. → Fairlearn.
-- Add one broken month and rerun:
-  ```bash
-  python ../00-data/simulate_emr.py --start 2025-01 --scenario muac_mm --out data/raw
-  dvc add data/raw && dvc repro      # roc_auc 0.81 -> 0.65, and no error anywhere
-  ```
-  The EMR started storing MUAC in mm (137 instead of 13.7). The pipeline ran
-  green and produced a much worse model. Nothing stopped it. → Great Expectations.
-
-  > **PAUSE (2 min).** What should have stopped it, and where in the pipeline?
-  (Undo: `rm data/raw/emr_2025-01.csv && dvc add data/raw && dvc repro`.)
 
 ## Exercises
 1. Set `prepare.test_months: 3`. Which stages rerun? Why does `train` rerun?
