@@ -87,7 +87,7 @@ python validate.py data/history
 #   OK: no critical failures
 ```
 Each monthly file is validated as its own batch, so a failure points at *which
-month* is broken. Open the Data Docs link printed at the end.
+month* is broken. Open the Data Docs link printed at the end (Part 5 looks at it properly).
 
 ## Part 3 – Break things
 
@@ -126,9 +126,11 @@ from Afar and Somali, or food distribution stopping, produces data that is
 this data like what the model was trained on?". That's Evidently (drift), and
 later performance monitoring once outcomes arrive.
 
-## Part 4 – Explore interactively
+## Part 4 – Try a rule before adding it
 
-When writing a new expectation, try it on one batch before adding it to the suite:
+Before a new rule goes into the suite, try it on one batch in Python. Here is a
+tighter version of a rule the suite already has: the suite lets
+`water_source_minutes` go up to 720; is 120 minutes a better limit?
 ```python
 import great_expectations as gx
 import great_expectations.expectations as gxe
@@ -138,20 +140,43 @@ ctx = gx.get_context(mode="file")
 batch_def = ctx.data_sources.get("emr").get_asset("visits").get_batch_definition("monthly_extract")
 batch = batch_def.get_batch(batch_parameters={"dataframe": pd.read_csv("data/scenario_messy_export/emr_2025-01.csv")})
 
+r = batch.validate(gxe.ExpectColumnValuesToBeBetween(column="water_source_minutes", min_value=0, max_value=120))
+print(r.success, r.result["unexpected_count"], r.result["partial_unexpected_list"][:5])
+#   False 8 [162, 122, 218, 138, 143]
+```
+(`partial_unexpected_list` shows a sample of the failing values.)
+
+> **PAUSE (2 min).** 8 rows (0.4%) fail. Are those errors, or children who really live
+> that far from water? Should the rule go into the suite?
+
+Probably not: in pastoralist regions long walks are real, and a rule that blocks
+real data teaches people to ignore the gate. Nothing was saved; the suite is
+unchanged. To keep a rule, add it to `build_suite.py`, rerun it, and look at
+`git diff gx/`.
+
+The same pattern shows what a *failing* check looks like, row by row:
+```python
 r = batch.validate(gxe.ExpectColumnValuesToBeInSet(column="sex", value_set=["F", "M"]))
 print(r.success, r.result["unexpected_count"], r.result["partial_unexpected_counts"])
 #   False 42 [{'value': 'female', 'count': 14}, {'value': 'male', 'count': 6}]
 ```
 (`partial_unexpected_counts` summarises a sample of the first 20 failures, not all 42.)
 
-## Part 5 – Data Docs
+## Part 5 – Read the Data Docs
 
-Open `gx/uncommitted/data_docs/local_site/index.html`. Two views:
+You've seen the link at the end of every `validate.py` run. Now open it:
+`gx/uncommitted/data_docs/local_site/index.html`. Two views:
 - **Expectation Suites:** the suite rendered as readable sentences. A clinician
   or data manager can review the rules without reading Python.
-- **Validation Results:** one page per run, with failing expectations and sample bad values.
+- **Validation Results:** one page per run, with failing expectations and sample bad
+  values. Each run is named after the folder and the month it checked, for example
+  `scenario_muac_mm--emr_2025-01` or `history--emr_2024-03`, so you can tell the
+  scenarios and months apart.
 
-`gx/uncommitted/` is gitignored: suites are code, results are run artefacts.
+Open the `scenario_messy_export--emr_2025-01` result and find the `sex` failure from
+Part 4. `gx/uncommitted/` is gitignored: suites are code, results are run artefacts.
+
+---
 
 ## Part 6 – Gate the DVC pipeline
 

@@ -16,6 +16,7 @@ from pathlib import Path
 
 import great_expectations as gx
 import pandas as pd
+from great_expectations.core.run_identifier import RunIdentifier
 
 HERE = Path(__file__).parent
 
@@ -36,7 +37,9 @@ def describe(r):
 
 def validate_file(checkpoint, path):
     df = pd.read_csv(path)
-    run = checkpoint.run(batch_parameters={"dataframe": df})
+    # The run name is what Data Docs shows next to each result: "scenario_muac_mm--emr_2025-01"
+    run_id = RunIdentifier(run_name=f"{Path(path).parent.name}--{Path(path).stem}")
+    run = checkpoint.run(batch_parameters={"dataframe": df}, run_id=run_id)
     results = [r for vr in run.run_results.values() for r in vr.results]
     failed = [describe(r) for r in results if not r.success]
     return {
