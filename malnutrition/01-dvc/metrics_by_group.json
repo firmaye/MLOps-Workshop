@@ -1,0 +1,112 @@
+{
+  "sex": {
+    "F": {
+      "n": 1953,
+      "prevalence": 0.1224,
+      "roc_auc": 0.7989,
+      "sensitivity": 0.5146,
+      "ppv": 0.3576,
+      "alert_rate": 0.1761
+    },
+    "M": {
+      "n": 2047,
+      "prevalence": 0.1177,
+      "roc_auc": 0.8067,
+      "sensitivity": 0.5892,
+      "ppv": 0.3114,
+      "alert_rate": 0.2228
+    }
+  },
+  "age_band": {
+    "0-5m": {
+      "n": 736,
+      "prevalence": 0.0788,
+      "roc_auc": 0.7507,
+      "sensitivity": 0.431,
+      "ppv": 0.2232,
+      "alert_rate": 0.1522
+    },
+    "24-59m": {
+      "n": 1305,
+      "prevalence": 0.0981,
+      "roc_auc": 0.8222,
+      "sensitivity": 0.4844,
+      "ppv": 0.337,
+      "alert_rate": 0.141
+    },
+    "6-23m": {
+      "n": 1959,
+      "prevalence": 0.1501,
+      "roc_auc": 0.7931,
+      "sensitivity": 0.6054,
+      "ppv": 0.3532,
+      "alert_rate": 0.2573
+    }
+  },
+  "region": {
+    "Addis Ababa": {
+      "n": 329,
+      "prevalence": 0.0426,
+      "roc_auc": 0.7236,
+      "sensitivity": 0.0714,
+      "ppv": 0.25,
+      "alert_rate": 0.0122
+    },
+    "Afar": {
+      "n": 183,
+      "prevalence": 0.2568,
+      "roc_auc": 0.7142,
+      "sensitivity": 0.5957,
+      "ppv": 0.4058,
+      "alert_rate": 0.377
+    },
+    "Amhara": {
+      "n": 900,
+      "prevalence": 0.1067,
+      "roc_auc": 0.7716,
+      "sensitivity": 0.5104,
+      "ppv": 0.25,
+      "alert_rate": 0.2178
+    },
+    "Oromia": {
+      "n": 1206,
+      "prevalence": 0.1053,
+      "roc_auc": 0.807,
+      "sensitivity": 0.5669,
+      "ppv": 0.3229,
+      "alert_rate": 0.1849
+    },
+    "SNNP": {
+      "n": 588,
+      "prevalence": 0.1259,
+      "roc_auc": 0.7985,
+      "sensitivity": 0.5405,
+      "ppv": 0.367,
+      "alert_rate": 0.1854
+    },
+    "Sidama": {
+      "n": 320,
+      "prevalence": 0.1062,
+      "roc_auc": 0.8256,
+      "sensitivity": 0.5294,
+      "ppv": 0.3913,
+      "alert_rate": 0.1437
+    },
+    "Somali": {
+      "n": 189,
+      "prevalence": 0.2381,
+      "roc_auc": 0.81,
+      "sensitivity": 0.7333,
+      "ppv": 0.4177,
+      "alert_rate": 0.418
+    },
+    "Tigray": {
+      "n": 285,
+      "prevalence": 0.1509,
+      "roc_auc": 0.7575,
+      "sensitivity": 0.5581,
+      "ppv": 0.3243,
+      "alert_rate": 0.2596
+    }
+  }
+}

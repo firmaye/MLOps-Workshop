@@ -1,0 +1,9 @@
+{
+  "n": 4000,
+  "prevalence": 0.12,
+  "roc_auc": 0.8022,
+  "sensitivity": 0.5521,
+  "ppv": 0.3312,
+  "alert_rate": 0.2,
+  "pr_auc": 0.3736
+}

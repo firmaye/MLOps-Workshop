@@ -1,0 +1,92 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: python src/prepare.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 1d72721a38d0ab9f98abf9a425b2921d.dir
+      size: 1346145
+      nfiles: 6
+    - path: src/prepare.py
+      hash: md5
+      md5: 141e5009a6c25c17ce77e68956f7f9e1
+      size: 1777
+    params:
+      params.yaml:
+        prepare:
+          test_months: 2
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: fedc49faaf54777be4b826067a49e3dd.dir
+      size: 1538622
+      nfiles: 2
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: ace3d4b35b721ff2e5bb4d1a86482b62
+      size: 1025352
+    - path: src/features.py
+      hash: md5
+      md5: 0ad1cde9871dfd709d3a095d89715015
+      size: 681
+    - path: src/train.py
+      hash: md5
+      md5: 14c4e7a2908c18318d10cdcc7dd6e0cc
+      size: 2008
+    params:
+      params.yaml:
+        train:
+          model: logistic
+          C: 1.0
+          max_depth: 3
+          learning_rate: 0.1
+          n_estimators: 200
+    outs:
+    - path: model.pkl
+      hash: md5
+      md5: ba8c3929a942d8ff0e5d61dbf538efcf
+      size: 6170
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 8b3e1f71e94e55dc846beea1150e0ea6
+      size: 513270
+    - path: model.pkl
+      hash: md5
+      md5: ba8c3929a942d8ff0e5d61dbf538efcf
+      size: 6170
+    - path: src/evaluate.py
+      hash: md5
+      md5: 33b52efa8c14caa627c4f767ff68390b
+      size: 3235
+    - path: src/features.py
+      hash: md5
+      md5: 0ad1cde9871dfd709d3a095d89715015
+      size: 681
+    params:
+      params.yaml:
+        evaluate:
+          alert_rate: 0.2
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: a873964e77b9fc975109805298b6bc49
+      size: 141
+    - path: metrics_by_group.json
+      hash: md5
+      md5: 72d5deb3e181b6c76618b75f3bc7c73b
+      size: 2232
+    - path: plots/pr.csv
+      hash: md5
+      md5: 22036fa24b87527f599cdcc547293237
+      size: 143113
+    - path: plots/roc.csv
+      hash: md5
+      md5: 01165456016013639d3321c7fde4e7b7
+      size: 24324
