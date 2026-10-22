@@ -63,6 +63,11 @@ UI or register models (MLflow), check fairness (Fairlearn), detect drift
 # DVC sends anonymous usage statistics by default. To opt out, either:
 dvc config --global core.analytics false   # permanently, for every DVC project on this machine
 # or: export DVC_NO_ANALYTICS=1            # just for this terminal session
+
+# DVC experiments (Part 6) make temporary git commits, so git must know who you are.
+# Skip this if `git config user.name` and `git config user.email` already print something:
+git config --global user.name  "Your Name"
+git config --global user.email "you@example.org"
 ```
 
 ## Part 1 – Version a growing dataset
@@ -183,7 +188,7 @@ dvc push             # 7 files pushed: only the 6 NEW months + the new manifest
 dvc repro            # all stages rerun: the data feeds everything
 dvc diff             # what changed vs the last commit: 6 files added; processed data + model modified
 dvc metrics diff     # compare metrics.json: last commit (HEAD) vs your current files (workspace)
-git add -A && git commit -m "EMR visits Jul-Dec 2024" && git tag v2-data
+git add -A && git commit -m "EMR visits Jul-Dec 2024" && git tag v2-data   # <- creates the v2-data tag used in Parts 5 and 8
 dvc push
 ```
 
