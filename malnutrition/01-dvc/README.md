@@ -405,3 +405,5 @@ Open `metrics_by_group.json` (sensitivity at one shared threshold):
    `dvc push` upload, and why?
 5. Delete `data/raw/emr_2024-03.csv` by accident. How do you get it back?
    (Hint: `dvc checkout`.) What if you also deleted `.dvc/cache`?
+
+Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
