@@ -1,4 +1,4 @@
-# 08 – LLM use case: a guideline assistant, and how to evaluate it
+# LLM clinical decision support (CDS): a guideline assistant, and how to evaluate it
 
 > **Status: ready, pending clinical review.** Runs end to end on hosted open-weight models (OpenRouter); the
 > facilitators' runs (21 Oct) are saved in `results/`, so every episode works without the key. `cases.csv`,
@@ -24,7 +24,7 @@ question / case ─────────────────────�
 From the repo root, environment active:
 ```bash
 python scripts/download.py guidelines        # the six PDFs (26 MB): only for the PDF rows of episode 1
-cd 08-llm-rag
+cd llm-cds
 export OPENROUTER_API_KEY=...                # the shared workshop key
 python rag.py "suspected cholera case definition" --docs markdown --chunking structure --search-only
 python cases.py answer --only case07 --trace # one simulated case, traced in MLflow

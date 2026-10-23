@@ -13,8 +13,8 @@ EMR data.
 | 4 | Fairlearn: who does the model miss? Per-group metrics, causes, mitigation | [`malnutrition/04-fairlearn/`](malnutrition/04-fairlearn/) |
 | 5 | Evidently: data drift, prediction drift, performance monitoring | [`malnutrition/05-evidently/`](malnutrition/05-evidently/) |
 | 6 | Prefect: the monthly pipeline that runs all of the above | [`malnutrition/06-prefect/`](malnutrition/06-prefect/) |
-| 7 | Use case: TB chest X-ray screening (Zambia study: acquisition drift vs population shift) | [`07-tb-xray/`](07-tb-xray/) |
-| 8 | Use case: an LLM assistant over the national guidelines: search as a versioned part, Ragas in depth, rubrics graded by people and by a checked judge, a cheaper model through the promotion rule | [`08-llm-rag/`](08-llm-rag/) |
+| – | Use case: TB chest X-ray screening (Zambia study: acquisition drift vs population shift) | [`tb-chest-xray/`](tb-chest-xray/) |
+| – | Use case: an LLM assistant over the national guidelines: search as a versioned part, Ragas in depth, rubrics graded by people and by a checked judge, a cheaper model through the promotion rule | [`llm-cds/`](llm-cds/) |
 
 ## Where each tool runs: training vs production, centre vs edge
 

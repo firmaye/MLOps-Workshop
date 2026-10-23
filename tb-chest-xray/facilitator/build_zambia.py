@@ -1,4 +1,4 @@
-"""Facilitator only: build 07-tb-xray/data/ from the Zambia study's chest X-rays.
+"""Facilitator only: build tb-chest-xray/data/ from the Zambia study's chest X-rays.
 
 Participants never need this: its outputs are committed (about 8 MB). It reads the study's DICOM
 images (download them with `python ../tb_helpers.py download-images`, about 1.7 GB), and writes:

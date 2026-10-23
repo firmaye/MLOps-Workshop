@@ -1,4 +1,4 @@
-# 07 – TB chest X-ray screening: one model, three clinics, two kinds of drift
+# TB chest X-ray screening: one model, three clinics, two kinds of drift
 
 **Use case demo.** The EMR lessons introduced the tools; this one shows what happens when an **image** model
 moves to new clinics and new patients. One notebook: [`tb_screening.ipynb`](tb_screening.ipynb), under a
@@ -30,7 +30,7 @@ Population shift: evaluate per group, set the threshold again on local lab resul
 From the repo root, environment active:
 ```bash
 python scripts/download.py zambia        # the study's participant table from Kaggle (355 KB, no account needed)
-cd 07-tb-xray
+cd tb-chest-xray
 ```
 Open `tb_screening.ipynb` in VSCode (kernel: `.venv`) and run it. The image features and DICOM header facts
 are in `data/` (5 MB, in the repo). The notebook tries to download 6 sample images to show them; without

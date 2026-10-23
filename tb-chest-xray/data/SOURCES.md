@@ -20,7 +20,7 @@ What is in this folder, and what is not:
 
 **Not included:** the images themselves and the participant table (symptoms, HIV status, lab results). Both
 are downloaded from Kaggle by each participant (`python scripts/download.py zambia`; images optional via
-`python 07-tb-xray/tb_helpers.py download-images`). The database is used under the ODbL with attribution;
+`python tb-chest-xray/tb_helpers.py download-images`). The database is used under the ODbL with attribution;
 the derived features are shared for teaching. If the data owners object, remove the `.npz` files and have
 participants compute features from the downloaded images (`facilitator/build_zambia.py`).
 

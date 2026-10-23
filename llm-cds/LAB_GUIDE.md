@@ -27,7 +27,7 @@ re-run with the same settings is instant. **All patient cases are SIMULATED and 
 
 From the repo root, environment active:
 ```bash
-cd 08-llm-rag
+cd llm-cds
 export OPENROUTER_API_KEY=...        # the shared workshop key (PowerShell: $env:OPENROUTER_API_KEY="...")
 python rag.py "What is the community case definition of a suspected cholera case?" --docs markdown --chunking structure --search-only
 python cases.py answer --only case07 --trace       # one simulated case, traced in MLflow
