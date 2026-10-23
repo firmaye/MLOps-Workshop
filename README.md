@@ -4,6 +4,8 @@ Hands-on lessons, one per tool, built around one running example: predicting
 which children are at risk of acute malnutrition from (synthetic) Ethiopian
 EMR data.
 
+The seven malnutrition lessons are taught in two blocks (data, then model); see [`malnutrition/README.md`](malnutrition/README.md) for what is core and what is optional.
+
 | # | Topic | Folder |
 |---|-------|--------|
 | 0 | Mock EMR data + drift scenarios; [notebook](malnutrition/00-data/explore_data.ipynb) to explore it | [`malnutrition/00-data/`](malnutrition/00-data/) |

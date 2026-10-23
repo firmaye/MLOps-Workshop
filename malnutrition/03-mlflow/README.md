@@ -91,7 +91,7 @@ Best ROC-AUC isn't the smallest girls/boys gap: a decision for people, not `ORDE
 Promotion rule (ROC-AUC +0.005, no sex group losing >0.02 sensitivity): **PROMOTE**,
 so `@champion` moves to version 2.
 
-## Serving: the model as an API
+## Serving: the model as an API *(optional)*
 
 With the environment **activated** (the server starts a helper program, `uvicorn`,
 that must come from the same environment), from this folder:
@@ -112,7 +112,7 @@ curl -s -X POST http://127.0.0.1:5001/invocations -H "Content-Type: application/
 `--env-manager local` uses your current environment; without it MLflow tries to build
 a fresh one from the model's saved requirements (slow, needs internet).
 
-## Should we actually serve with MLflow?
+## Should we actually serve with MLflow? *(optional)*
 
 `mlflow models serve` is a quick, honest way to show "a registered model becomes an API",
 and fine for internal tools and pilots. For production, teams usually choose one of:
@@ -126,7 +126,7 @@ and fine for internal tools and pilots. For production, teams usually choose one
 
 In the workshop: show serving, then ask which of these fits the ministry's setup.
 
-## Central MLOps, light deployments
+## Central MLOps, light deployments *(optional)*
 
 MLflow, DVC and Great Expectations are **training-side** tools: they belong where models
 are built, compared and approved (a ministry server, a cloud project). They don't need to
@@ -153,7 +153,7 @@ point of care depends on the deployment context.* Distribute the model and a min
 input check, not the MLOps stack. Worth asking the ministry: where would predictions run
 (central batch, district server, eCHIS tablets), and how often do devices sync?
 
-## Gotchas we hit building this (MLflow 3.17)
+## Gotchas we hit building this (MLflow 3.17) *(optional)*
 
 - **"Untrusted types" when logging a model.** MLflow 3 saves scikit-learn models with
   *skops* (safer than pickle: loading can't run arbitrary code) and refuses classes it
@@ -174,7 +174,7 @@ input check, not the MLOps stack. Worth asking the ministry: where would predict
   Re-running notebook 2 without that registers additional versions (harmless, but the
   version numbers won't match the text).
 
-## For a team: a shared tracking server
+## For a team: a shared tracking server *(optional)*
 
 Locally, MLflow writes to `mlflow.db` + `mlruns/`. A team runs one server that everyone logs to:
 ```bash
@@ -199,4 +199,4 @@ which matters where health data must stay on government infrastructure.
 5. Use `train.py` from the terminal to log a run, then find it in the UI. What does the
    UI show under *Source* compared with the notebook runs?
 
-Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
+Try the exercises first (they are take-home). Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) holds a worked answer to each; it ships without outputs, so run it to see them.

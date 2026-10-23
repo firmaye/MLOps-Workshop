@@ -86,4 +86,4 @@ review), not model capacity.
 5. **Resume matching.** Sketch the same analysis for shortlisting candidates: what is
    the "miss", which groups, which definition, and which mitigations are allowed?
 
-Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
+Try the exercises first (they are take-home). Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) holds a worked answer to each; it ships without outputs, so run it to see them.

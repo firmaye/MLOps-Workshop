@@ -190,4 +190,4 @@ rm -rf data reports mlflow.db mlruns .dvc .dvcignore
 5. **An edge bundle.** Add a final task that exports the champion as a points table plus
    input rules for offline devices (see the main README). When should it run?
 
-Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
+Try the exercises first (they are take-home). Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) holds a worked answer to each; it ships without outputs, so run it to see them.

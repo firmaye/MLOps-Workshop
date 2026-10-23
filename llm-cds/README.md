@@ -89,6 +89,20 @@ conclusion on validating an LLM tool in Ethiopia.
 | `facilitator/` | `parse_guidelines.py` (LlamaParse, facilitator only), `check_quotes.py` |
 | `results/` | saved answers, verdicts, judge grades and scores (reused on re-runs; the offline fallback) |
 
+## Helper functions in this lesson
+
+| Helper | Where | What it does |
+|---|---|---|
+| `Settings` | `rag.py` | everything that defines one version of the assistant (documents, chunking, search, prompt, model); logged with every run |
+| `load_pages`, `make_passages` | `rag.py` | PDF pages cut into overlapping passages (never across a page) |
+| `markdown_blocks`, `merge_continued_tables`, `make_structure_passages` | `rag.py` | the structure-aware route: Markdown split into blocks, a table carried over a page break rejoined, passages that follow headings |
+| `Retriever`, `EmbeddingRetriever`, `build` | `rag.py` | keyword search or embedding search over the passages |
+| `answer(question, retriever, settings)` | `rag.py` | retrieve, then generate; returns the answer and everything needed to evaluate it |
+| `fingerprint`, `source_ids` | `rag.py` | a short hash of the indexed text (changes when a document or the chunking changes) and `doc:p28` style source labels |
+| `retrieval_checks`, `rule_checks`, `evaluate` | `evaluate.py` | right page in the top k; simple rules; Ragas scores; everything logged to MLflow |
+| `sheet`, `agreement`, `fleiss_kappa`, `judge` | `cases.py` | the grading sheet, agreement between graders (Cohen, Fleiss), the LLM judge, checked against people |
+| `call`, `cost` | `cases.py` | one LLM call with tokens, cost and seconds as OpenRouter reports them; total spend |
+
 ## Open items
 
 - Clinical review of `cases.csv` (cases to check first in the facilitator notes), `eval_questions.csv`,

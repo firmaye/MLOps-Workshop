@@ -104,6 +104,14 @@ def check_machine():
 
     git = run(["git", "--version"])
     report("PASS", git) if git and git.startswith("git version") else report("FAIL", "git", "install git (see the setup guide)")
+    if git and git.startswith("git version"):
+        name, email = run(["git", "config", "user.name"]), run(["git", "config", "user.email"])
+        if name and email:
+            report("PASS", f"git identity: {name} <{email}>")
+        else:
+            report("FAIL", "git identity not set",
+                   'DVC experiments need it: `git config --global user.name "Your Name"` and '
+                   '`git config --global user.email "you@example.com"`')
 
 
 def check_python():

@@ -59,6 +59,24 @@ can recompute the features (`facilitator/build_zambia.py`), look at more images,
 
 Seven **PAUSE** prompts ask participants to commit to an answer before each result is shown.
 
+## Helper functions in this lesson
+
+In `tb_helpers.py` (read-only plumbing):
+
+| Helper | What it does |
+|---|---|
+| `load_participants()`, `load_data()` | the study table (symptoms, HIV status, lab results, Google's AI score) joined to each image's DICOM header facts and image features |
+| `download_images`, `dicom_to_224` | fetch the DICOM files; turn one into a 224×224 grayscale array (this is where `PhotometricInterpretation` is applied) |
+| `embed_pixels` | runs the pretrained chest X-ray network: images in, 1,024 numbers per image out. These are the model's features |
+| `load_bug_features` | the same images processed by a pipeline that **ignores** the inversion flag: the Step 3 bug, on purpose |
+| `threshold_for_sensitivity(y, p, 0.90)` | the highest threshold that still catches 90% of TB cases |
+| `screening_metrics(y, p, thr)` | what a TB programme cares about at a threshold: sensitivity, specificity, flag rate, positive predictive value |
+
+Written in the notebook: `new_model` (the logistic pipeline), `evaluate` (metrics for a set of people),
+`header_check` (share of images whose DICOM header is rare or absent at the reference clinic), `feature_drift`
+(can a classifier tell the new site from Kanyama?), `label_free` (the checks that need no lab result) and
+`bootstrap_auc` (ROC-AUC with an interval).
+
 ## Key messages for the room
 
 - **Nothing crashes when a model moves.** At Chainda South every prediction was a valid probability and every
@@ -93,4 +111,4 @@ Licence notes: [`data/SOURCES.md`](data/SOURCES.md).
 6. **A monitoring function.** Write a function that takes a batch (rows of `people`) and returns the header
    mismatch, feature drift and flag rate as a dict, ready for a Prefect task (compare lesson 06).
 
-Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
+Try the exercises first (they are take-home). Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) holds a worked answer to each; it ships without outputs, so run it to see them.

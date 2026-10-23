@@ -126,7 +126,7 @@ from Afar and Somali, or food distribution stopping, produces data that is
 this data like what the model was trained on?". That's Evidently (drift), and
 later performance monitoring once outcomes arrive.
 
-## Part 4 – Try a rule before adding it
+## Part 4 – Try a rule before adding it *(optional)*
 
 Before a new rule goes into the suite, try it on one batch in Python. Here is a
 tighter version of a rule the suite already has: the suite lets
@@ -162,7 +162,7 @@ print(r.success, r.result["unexpected_count"], r.result["partial_unexpected_coun
 ```
 (`partial_unexpected_counts` summarises a sample of the first 20 failures, not all 42.)
 
-## Part 5 – Read the Data Docs
+## Part 5 – Read the Data Docs *(optional)*
 
 You've seen the link at the end of every `validate.py` run. Now open it:
 `gx/uncommitted/data_docs/local_site/index.html`. Two views:
@@ -256,4 +256,4 @@ Two things to point out:
    rows. Should a cleaning step like this live in the pipeline, or should the
    EMR export be fixed upstream?
 
-Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
+Try the exercises first (they are take-home). Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) holds a worked answer to each; it ships without outputs, so run it to see them.

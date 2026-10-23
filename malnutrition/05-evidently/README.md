@@ -111,4 +111,4 @@ distance (categorical); a column counts as drifted at ≥ 0.1. `ValueDrift(metho
    `{"month", "status", "failed_checks", "mean_risk"}` as a dict, ready for the Prefect
    pipeline to log or alert on.
 
-Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
+Try the exercises first (they are take-home). Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) holds a worked answer to each; it ships without outputs, so run it to see them.

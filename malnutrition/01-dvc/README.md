@@ -228,7 +228,7 @@ dvc checkout         # DVC files back to what dvc.lock says: model.pkl is the lo
 You need both: git restores the *pointers*, `dvc checkout` makes the real files
 match them. (If gbm had been better, you'd commit instead.)
 
-## Part 5 – Comparing more than two versions
+## Part 5 – Comparing more than two versions *(optional)*
 
 `dvc metrics diff` with no arguments compares **HEAD** (your last commit) with
 the **workspace** (current files, possibly uncommitted). You can compare any two
@@ -251,7 +251,7 @@ history of metrics stored in git, useful for "did this change help?" (and in CI
 on pull requests). It has no UI, no stage labels like *staging* / *production*,
 no approvals. MLflow (next lesson) does that properly; DVC keeps the data lineage.
 
-## Part 6 – Experiments without committing (optional for DVC regulars)
+## Part 6 – Experiments without committing *(optional)*
 
 Every Part 4–style trial normally means edit, run, commit-or-discard. DVC
 experiments let you try many settings without touching git history:
@@ -274,7 +274,7 @@ Experiments are stored as hidden git refs, not commits, so until you promote
 one it doesn't appear in `git log`. Worth showing if your participants use DVC;
 otherwise skip, since MLflow covers experiment tracking with a UI.
 
-## Part 7 – Plots
+## Part 7 – Plots *(optional)*
 
 ```bash
 dvc plots diff v1 -o plots_html    # ROC + PR curves, v1 vs now; open plots_html/index.html
@@ -301,7 +301,7 @@ ls data/raw | wc -l                # 12 months
 If the data was pushed, a colleague with a fresh clone can do the same thing
 (`git checkout v1 && dvc pull`). This is the question DVC exists to answer.
 
-### 8b (optional) – Read a pinned version from code, without checking out
+### 8b *(optional)* – Read a pinned version from code, without checking out
 
 Same idea, from Python. Typical use: a scoring service or another team loads
 *exactly* the model tagged for release, without cloning and checking out.
@@ -317,7 +317,7 @@ with dvc.api.open("malnutrition/01-dvc/model.pkl", repo="../..", rev="v1", mode=
 ```
 `repo` can also be a GitHub URL, given access to the DVC remote.
 
-## Part 9 – Housekeeping
+## Part 9 – Housekeeping *(optional)*
 
 ```bash
 dvc gc --all-tags --all-branches -f     # delete cached files no tag or branch points to
@@ -345,7 +345,7 @@ Undo before moving on: `rm data/raw/emr_2025-01.csv && dvc add data/raw && dvc r
 
 ---
 
-## Sharing with a team: remotes and data registries
+## Sharing with a team: remotes and data registries *(optional)*
 
 **Remote** = where `dvc push` puts the bytes. What teams actually use:
 
@@ -406,4 +406,4 @@ Open `metrics_by_group.json` (sensitivity at one shared threshold):
 5. Delete `data/raw/emr_2024-03.csv` by accident. How do you get it back?
    (Hint: `dvc checkout`.) What if you also deleted `.dvc/cache`?
 
-Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
+Try the exercises first (they are take-home). Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) holds a worked answer to each; it ships without outputs, so run it to see them.
