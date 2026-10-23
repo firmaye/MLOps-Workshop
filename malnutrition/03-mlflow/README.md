@@ -189,3 +189,5 @@ which matters where health data must stay on government infrastructure.
    confirm the January 2025 risk scores change back.
 5. Use `train.py` from the terminal to log a run, then find it in the UI. What does the
    UI show under *Source* compared with the notebook runs?
+
+Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.

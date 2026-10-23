@@ -68,3 +68,5 @@ MLflow lesson's helper module (`../03-mlflow/emr_model.py`) and generates its ow
    tighten the promotion rule to require a gap below 0.03.
 5. **Resume matching.** Sketch the same analysis for shortlisting candidates: what is
    the "miss", which groups, which definition, and which mitigations are allowed?
+
+Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
