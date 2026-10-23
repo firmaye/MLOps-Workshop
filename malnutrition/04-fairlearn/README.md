@@ -41,6 +41,23 @@ MLflow lesson's helper module (`../03-mlflow/emr_model.py`) and generates its ow
   time is normal in clinical care (growth standards are sex-specific); in hiring (the
   resume-matching use case) protected attributes usually can't be used at all.
 
+## Helper functions in this lesson
+
+| Helper | What it does |
+|---|---|
+| `sensitivity_with_ci(y, flag, group)` | sensitivity per group with a bootstrap confidence interval, so small gaps are not over-read |
+| `summarise(name, score, flag)` | one row of the comparison table: ROC-AUC, alert rate, sensitivity by sex, the gap |
+| `top20(score)` | flags the top 20% of scores: the programme's follow-up capacity |
+| `equal_sensitivity_flags(...)` | per-group thresholds that give boys and girls the same sensitivity at the same total alerts |
+
+## Why doesn't a better model remove the gap?
+
+The model already adjusts for sex (the `sex_F` coefficient). Interactions and boosted trees (the notebook
+runs both) leave a gap of 0.07 → 0.07 / 0.05, against 0.04 without the sex feature. The model is not too simple:
+the label is partly defined by MUAC, which reads lower in girls at the same nutrition, and the record has no way
+to tell a malnourished girl from a normally thin-armed one. The fixes are decisions (threshold, features,
+review), not model capacity.
+
 ## Fairlearn cheat sheet
 
 | Call | What it does |

@@ -37,17 +37,12 @@ source .venv/bin/activate           # Windows: .venv\Scripts\activate
 cd malnutrition/03-mlflow
 export MLFLOW_DISABLE_TELEMETRY=true   # optional: MLflow 3 sends anonymous usage data by
                                        #   default (like DVC's analytics); this turns it off
-mlflow ui --port 5000               # leave running; open http://127.0.0.1:5000
 ```
 To make the opt-out permanent, add the `export` line to your shell profile (`~/.zshrc`
 on macOS). The notebooks turn it off themselves in their first cell.
 
-**In the UI, switch the toggle at the top left from *GenAI* to *Model training*.**
-MLflow 3 opens in GenAI mode (LLM traces), which shows none of our runs. In *Model
-training* mode the left menu has **Runs**, **Models** (logged models) and **Model
-registry**. The *MLflow Assistant* panel on the right is optional; close it with ✕.
-
-Then open the notebooks in VSCode (kernel: `.venv`) and run them in order:
+Then open the notebooks in VSCode (kernel: `.venv`) and run them in order (the first
+notebook starts the MLflow UI and tells you what to click):
 1. **`1_tracking.ipynb`**: log one run by hand, then a grid of runs; compare them in
    the UI and with `mlflow.search_runs`; see what autolog does and doesn't capture.
 2. **`2_registry.ipynb`**: register the best run as `gam-risk` v1 (`@champion`);
@@ -57,6 +52,20 @@ Then open the notebooks in VSCode (kernel: `.venv`) and run them in order:
 
 Each notebook takes about a minute to run. The data (generated with the shared
 simulator) goes in `03-mlflow/data/`.
+
+## Helper functions in this lesson
+
+Not everything a run records comes from MLflow. These are our own helpers, so nothing is a surprise:
+
+| Helper | Where | What it does |
+|---|---|---|
+| `em.fingerprint(df)` | `emr_model.py` | MD5 of the training data; logged as the `data_md5` tag. **Not automatic**: MLflow does not know which data you used |
+| `em.git_commit()` | `emr_model.py` | current git commit; logged as the `git_commit` tag. MLflow records git itself only for runs started from a *script* (`mlflow run` / `python train.py`), not from a notebook, so we set it explicitly |
+| `em.evaluate(model, df)` | `emr_model.py` | **where the metrics are defined**: ROC-AUC, PR-AUC, calibration (observed/predicted), alert-rate sensitivity; `flat_group_metrics` adds per-sex numbers. `mlflow.log_metrics` just stores what these return |
+| `em.build_model(kind, ...)` | `emr_model.py` | the sklearn pipeline (logistic or gradient boosting) |
+| `em.load_months`, `em.simulate` | `emr_model.py` | read or generate the monthly extracts |
+| `em.roc_figure` | `emr_model.py` | the ROC plot logged as an artifact |
+| `train_and_log(...)` | `train.py` | one function that builds, fits, evaluates and logs a run: the "log one run" cell, reusable in a grid |
 
 ## Verified results (what you should see)
 

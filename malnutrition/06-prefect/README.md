@@ -99,6 +99,34 @@ like "food distribution stopped") matter.
 - **Deployments:** after `python pipeline.py serve`, `monthly-pipeline/monthly-emr` with its
   schedule; you can also start a run from here with custom parameters.
 
+## The commands, in plain words
+
+| Command | What it does | When |
+|---|---|---|
+| `bootstrap` | builds the 2024 history, versions it with DVC, trains the first champion | once, first |
+| `month 2025-03 [scenario]` | runs the whole flow for **one** month. `scenario` picks what the simulator does to that month: `baseline` (default), `new_regions`, `muac_mm`, `concept_shift`, `missing_anthro`, `messy_export` | to try one failure on purpose |
+| `timeline` | `bootstrap` + all 15 months of 2025 in a row, with the scenarios built in, so the story plays out | the demo |
+| `serve` | registers a deployment that runs `month` by itself at 06:00 on the 2nd of each month | what production would be |
+
+`timeline` is only a loop over `month`; in real life nobody would run it.
+
+**Observed / predicted** is the calibration check. Observed = the share of children who actually became
+malnourished; predicted = the average risk the model gave them. A ratio near 1 means the risk numbers mean
+what they say. 2.0 means twice as many fell ill as predicted, and the pipeline's acceptable range is 0.67 to 1.5.
+It is checked three months after scoring because that is when outcomes are known.
+
+**Why a CLI and not a notebook?** A notebook is for exploring and teaching one step; this is the part that runs
+unattended, with retries and a schedule, so it must be a script. The earlier notebooks explain each piece. Open
+`pipeline.py` and read the `@flow` and `@task` functions as the table of contents.
+
+## Helper functions in this lesson
+
+`pipeline.py` reuses `emr_model.py` from lesson 03. Its own tasks: `ingest` (read, with retries),
+`validate` (GX checkpoint), `quarantine` (move a failed month aside), `version` (`dvc add`), `score` (champion by
+alias), `drift_gate` (Evidently checks), `performance` (observed/predicted, ROC-AUC, per-sex sensitivity),
+`retrain_and_decide` (challenger vs champion, promotion rule) and `report` (append to
+`reports/monitoring_log.csv`). Flows: `bootstrap`, `monthly-pipeline`, `timeline-2025`.
+
 ## Prefect concepts used
 
 | Concept | In `pipeline.py` |

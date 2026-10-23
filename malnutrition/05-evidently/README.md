@@ -59,6 +59,24 @@ harmless `SyntaxWarning`.
 - **Who acts on what:** data broken → GX / EMR team; population changed → check fairness
   (Fairlearn) and performance; model wrong → retrain a challenger (MLflow registry).
 
+## Helper functions in this lesson
+
+| Helper | What it does |
+|---|---|
+| `reference_for(month)` | picks the reference data: the **same season** of the training year (lean season vs not) |
+| `monitoring_gate(current, month, reference=None)` | the drift checks (risk, region, MUAC drift ≤ 0.1; missing weights ≤ 5%); returns the report and the list of failed checks |
+| `drift_report(current, reference)` | runs Evidently on the chosen columns |
+| `drift_table(report)` | the report as a tidy table |
+| `scored(month, scenario)` | loads a month, scores it with the model, adds `risk` |
+| `performance(...)` | once outcomes are known: ROC-AUC and observed/predicted |
+
+## Is the reference period always obvious?
+
+No, and it is a place to cheat without meaning to. The notebook runs the same gate against five references. Big
+problems (`muac_mm`, `new_regions`) fail under all of them; a normal month can fail against "all of 2024" because
+it mixes seasons. So **decide the reference rule once, in writing, before looking at results**, and treat changes
+to it like changes to a threshold. If two sensible references disagree, look at the data; don't pick the quiet one.
+
 ## Evidently cheat sheet (0.7 API)
 
 Older tutorials (`ColumnMapping`, `TestSuite`, `metric_preset`) use the pre-0.7 API and won't work.
