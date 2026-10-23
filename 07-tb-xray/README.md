@@ -92,3 +92,5 @@ Licence notes: [`data/SOURCES.md`](data/SOURCES.md).
    well does it do on its own mix, and on Kanyama alone? What did it learn?
 6. **A monitoring function.** Write a function that takes a batch (rows of `people`) and returns the header
    mismatch, feature drift and flag rate as a dict, ready for a Prefect task (compare lesson 06).
+
+Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
