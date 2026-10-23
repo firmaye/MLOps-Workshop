@@ -29,6 +29,13 @@ exercises 3–5 as take-home.
 message, fine). Say: "The header is free information. Most pipelines throw it away." PAUSE 1 answers to look for:
 the Konica machine; the inverted pixel storage; "validate at each site before trusting it".
 
+*Photometric interpretation, in one minute:* the header says whether small pixel numbers are dark
+(`MONOCHROME2`, the usual) or bright (`MONOCHROME1`). Same X-ray, opposite numbers. "Inversion" is the flip
+(`max − value`). Show the two-image cell: the Fujifilm raw numbers drawn as they are look like a negative
+(empty corner = 4091), the Konica ones look right (corner = 36). Ignoring the field turns every image from
+the other machine into a negative, with no error. Quick test anyone can do: the empty corner of a chest X-ray
+should be black.
+
 **Step 1.** Expected: ROC-AUC 0.80, sensitivity 0.84, specificity 0.52 on 155 held-out people (25 TB). Google's
 model on the same group: ROC-AUC 0.90. Say: "A modest model, trained on about 360 X-rays. The question today is
 not how good it is here, but what happens when it moves." The checks table: Kanyama's own 3% header mismatch is
@@ -52,8 +59,10 @@ PAUSE 6: they need per-group lab results; ask how many TB cases they'd want (we 
 0.74 (intervals overlap); Google's 0.90 → 0.82, sensitivity 0.94 → 0.81 (intervals barely overlap). Smear-negative
 TB 48% vs 38%. Say: "Nothing in the images warned us. This is the failure monitoring can't see."
 
-**Summary.** Read the "which check caught what" table aloud. Closing PAUSE: take two or three answers; they feed
-Friday's plans.
+**Summary.** Read the "which check caught what" table aloud, then the "what do you do about it" table. The deciding
+question is *ranking or cut-off?*: ranking intact → set the threshold again locally (costs more flags); ranking
+worse (Chainda: threshold gets 6 of 7 cases, ROC-AUC stays 0.65) → no threshold helps, retrain or fine-tune.
+Closing PAUSE: take two or three answers; they feed Friday's plans.
 
 ## Fallbacks
 
@@ -71,6 +80,11 @@ Friday's plans.
 5. Previous TB (exercise 1): old scars flag two in three previously treated people with Google's model. How would you design the programme around that?
 
 ## Facts you may be asked
+
+- **Does standardising the images fix Chainda South?** In a quick facilitator test (7 TB cases, so treat as
+  indicative only), histogram equalisation or per-image standardisation after following the header left
+  feature drift at about 1.0 and moved ROC-AUC from 0.65 to 0.69–0.71. Cleaning up the images helps a little
+  and is still not enough: the next step is labelled images from the new machine. Not in the notebook.
 
 - Data: Google + CIDRZ prospective study, three Lusaka clinics, 1,828 adults, all lab-tested (culture/Xpert);
   Kazemzadeh et al., *NEJM AI* 2024. Positive = bacteriologically confirmed; 207 clinically diagnosed count as negative.

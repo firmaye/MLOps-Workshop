@@ -20,6 +20,11 @@ staged rollout of our own model:
 rate) and can make a model fail completely; population shift is silent to every input check and only lab
 results reveal it. Plus: passing the input checks doesn't prove the model works (step 2).
 
+**What to do about each:** the label-free checks say which kind of change you have; then ask whether the *ranking*
+(ROC-AUC) is still good or only the cut-off is wrong. Acquisition drift: fix the pipeline (follow the header,
+standardise the images), then retrain or fine-tune with images from the new machine if ROC-AUC is still low.
+Population shift: evaluate per group, set the threshold again on local lab results, and retrain if ROC-AUC fell.
+
 ## Setup
 
 From the repo root, environment active:
@@ -38,7 +43,8 @@ can recompute the features (`facilitator/build_zambia.py`), look at more images,
 ## What's in the notebook
 
 1. **Look at the data, including the headers:** the three clinics' X-ray machines differ, and the DICOM
-   header says so (manufacturer, how pixels are stored, pixel size).
+   header says so (manufacturer, how pixels are stored, pixel size). A short explanation of
+   `PhotometricInterpretation` and image inversion, with two real images (raw numbers vs our pipeline).
 2. **Step 1:** train at Kanyama (HIV-negative), threshold for 90% sensitivity from cross-validated predictions,
    log to MLflow, register `tb-screening@champion`. Google's model on the same people for comparison.
 3. **The checks for every new site:** header check, feature drift (can a classifier tell the sites apart?),
