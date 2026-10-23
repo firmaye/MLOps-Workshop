@@ -30,3 +30,7 @@ setup_report.txt
 # LLM demo: LlamaParse responses and pilot output (facilitator/parse_guidelines.py; the Markdown is committed)
 08-llm-rag/facilitator/raw/
 08-llm-rag/facilitator/pilot/
+
+# facilitator notes are private: kept outside the repository
+**/FACILITATOR_NOTES.md
+facilitator-notes/

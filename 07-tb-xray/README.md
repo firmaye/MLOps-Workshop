@@ -76,8 +76,7 @@ Seven **PAUSE** prompts ask participants to commit to an answer before each resu
 
 ## Facilitator notes
 
-Timing, what to say at each PAUSE, expected numbers, fallbacks and discussion questions:
-[`FACILITATOR_NOTES.md`](FACILITATOR_NOTES.md). Licence notes: [`data/SOURCES.md`](data/SOURCES.md).
+Licence notes: [`data/SOURCES.md`](data/SOURCES.md).
 
 ## Exercises
 

@@ -16,8 +16,6 @@ EMR data.
 | 7 | Use case: TB chest X-ray screening (Zambia study: acquisition drift vs population shift) | [`07-tb-xray/`](07-tb-xray/) |
 | 8 | Use case: an LLM assistant over the national guidelines: search as a versioned part, Ragas in depth, rubrics graded by people and by a checked judge, a cheaper model through the promotion rule | [`08-llm-rag/`](08-llm-rag/) |
 
-Facilitators: [`malnutrition/FACILITATOR_NOTES.md`](malnutrition/FACILITATOR_NOTES.md) (lessons 00–06, Tuesday); each use case has its own.
-
 ## Where each tool runs: training vs production, centre vs edge
 
 The MLOps tools in this workshop live **where models are built and managed**. They are

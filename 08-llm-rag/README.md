@@ -72,8 +72,7 @@ to a person 13 → 6 of 44 ([`data/SOURCES.md`](data/SOURCES.md)).
 
 [`LAB_GUIDE.md`](LAB_GUIDE.md): set up and a traced call; Ragas in depth with search as a part; labels, rubrics and
 benchmarks (graders' agreement, the judge against the room, HealthBench); a cheaper model through the promotion rule;
-conclusion on validating an LLM tool in Ethiopia. Timing, what to say, fallbacks and the clinical-review list:
-[`FACILITATOR_NOTES.md`](FACILITATOR_NOTES.md).
+conclusion on validating an LLM tool in Ethiopia.
 
 ## Files
 
