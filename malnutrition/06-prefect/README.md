@@ -115,6 +115,19 @@ malnourished; predicted = the average risk the model gave them. A ratio near 1 m
 what they say. 2.0 means twice as many fell ill as predicted, and the pipeline's acceptable range is 0.67 to 1.5.
 It is checked three months after scoring because that is when outcomes are known.
 
+**Example.** 1,000 children scored. Average predicted risk 0.10 (about 100 expected cases); 120 actually became
+malnourished (observed 0.12). Ratio 0.12 / 0.10 = 1.2: slightly more illness than the model expected, inside the
+0.67–1.5 range. A ratio of 2.0 or 0.5 would be flagged.
+
+**When does calibration matter?**
+- *Top 20% by rank* (our setup): barely. The cut-off is a rank, so doubling every risk flags the same children.
+- *Fixed probability cut-off or a target sensitivity* (e.g. "flag risk ≥ 0.15, which caught 80% last year"):
+  a lot. If risks drift up you flag too many; if they drift down you miss cases and sensitivity falls below target.
+  The true sensitivity is only known when outcomes arrive, so a drifting ratio is the early warning that the
+  threshold no longer means what you chose. Re-pick or recalibrate on recent labelled data.
+- *Per-group thresholds* (lesson 04) are tuned on each group's scores, so calibration moving differently by sex
+  quietly breaks the equal-sensitivity guarantee.
+
 **Why a CLI and not a notebook?** A notebook is for exploring and teaching one step; this is the part that runs
 unattended, with retries and a schedule, so it must be a script. The earlier notebooks explain each piece. Open
 `pipeline.py` and read the `@flow` and `@task` functions as the table of contents.
