@@ -255,3 +255,5 @@ Two things to point out:
    "female"/"male", converts MUAC > 50 from mm to cm, and removes out-of-cohort
    rows. Should a cleaning step like this live in the pipeline, or should the
    EMR export be fixed upstream?
+
+Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
