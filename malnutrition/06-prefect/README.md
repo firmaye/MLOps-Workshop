@@ -148,3 +148,5 @@ rm -rf data reports mlflow.db mlruns .dvc .dvcignore
    What does the monitoring log show?
 5. **An edge bundle.** Add a final task that exports the champion as a points table plus
    input rules for offline devices (see the main README). When should it run?
+
+Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.

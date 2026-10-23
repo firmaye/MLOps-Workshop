@@ -92,3 +92,5 @@ distance (categorical); a column counts as drifted at ≥ 0.1. `ValueDrift(metho
 5. **Wire it up.** Write a function that takes a month's file and returns
    `{"month", "status", "failed_checks", "mean_risk"}` as a dict, ready for the Prefect
    pipeline to log or alert on.
+
+Stuck, or short on time? [`exercise_solutions.ipynb`](exercise_solutions.ipynb) runs a worked answer to each exercise.
