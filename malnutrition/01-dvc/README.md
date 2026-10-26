@@ -68,6 +68,10 @@ dvc config --global core.analytics false   # permanently, for every DVC project 
 # Skip this if `git config user.name` and `git config user.email` already print something:
 git config --global user.name  "Your Name"
 git config --global user.email "you@example.org"
+
+# You should be on your `work` branch (created once during the main README setup).
+# Check with `git branch --show-current`; if it says `main`, create it now:
+git checkout -b work
 ```
 
 ## Part 1 – Version a growing dataset
