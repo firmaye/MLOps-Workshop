@@ -61,6 +61,24 @@ months, DVC-tracked), `data/quarantine/`, `data/predictions/`, `reports/` (monit
 `data/raw.dvc`). The first run of `dvc init` stages its files in git; commit them on your
 `work` branch if you want the data versions recorded, or unstage with `git restore --staged .`.
 
+## Showing the results
+
+The terminal output is hard to read on a projector, so after `python pipeline.py timeline` finishes open
+[`timeline_results.ipynb`](timeline_results.ipynb) in VSCode (kernel `.venv`) and run it. It reads the pipeline's log
+and draws the year in one picture (predicted vs real rate, the calibration check, and the data and drift gates month by
+month) plus a colour-coded table. It is saved with its outputs, so it works even if a laptop can't run the pipeline.
+
+A suggested run of the session (about 35 minutes):
+1. **Frame it (3 min):** the step diagram above. What Prefect adds: order, retries, a stop when a check fails, a
+   history of runs, a schedule.
+2. **Read `monthly_pipeline` in `pipeline.py` (5 min):** about 40 lines. Point at `@flow`/`@task`, `retries=2` on `ingest`,
+   the "if the gate fails, quarantine and stop" branch, and the retrain rule.
+3. **Start `timeline` and ask the first PAUSE (3 min):** it takes about 3 minutes; ask which month the pipeline will notice.
+4. **Walk the picture, then the table (10 min).** Top panel first: the model's average risk stays flat while the real rate
+   jumps. Then the calibration panel: it only notices in July, three months late. Then the gate strip: February stop,
+   March drift, November promote. The Prefect UI is a two-minute side trip (Runs, the January retry, Artifacts).
+5. **Discuss (10 min):** the "seven months" PAUSE; automatic promotion; who owns each number.
+
 ## Verified result: the 2025 timeline
 
 > **PAUSE (3 min).** Food distribution stops in April 2025. Before running the timeline:
