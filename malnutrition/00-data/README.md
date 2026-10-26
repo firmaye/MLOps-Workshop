@@ -6,7 +6,7 @@ Ethiopian DHS analyses; the numbers are invented.
 
 **Start here:** open [`explore_data.ipynb`](explore_data.ipynb) in VSCode (select
 the `.venv` kernel) and run it top to bottom. It looks at the outcome rate by
-month/region/age/sex, the MUAC vs WHZ difference between girls and boys, and what
+month/region/age/sex, how MUAC and WHZ relate, and what
 each drift scenario looks like next to normal data.
 
 ## The prediction task
@@ -35,8 +35,10 @@ each drift scenario looks like next to normal data.
 
 Built-in realism:
 - **Lean season (Jun–Sep):** risk rises from ~9% to ~15%.
-- **MUAC vs WHZ:** at the same WHZ, MUAC reads lower for girls and under-2s,
-  mirroring field findings that the two criteria disagree most for those groups.
+- **MUAC vs WHZ:** at the same WHZ, MUAC reads lower for under-2s,
+  mirroring field findings that the two criteria disagree most for the youngest.
+- **A small sex difference:** boys develop GAM slightly more often than girls
+  (about 11.3% vs 10.7% in 2024). The direction follows surveys; the size is synthetic.
 - **Deterministic:** each month's seed depends only on the month, so a file
   is byte-identical however and whenever it's generated.
 

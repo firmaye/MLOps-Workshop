@@ -390,9 +390,8 @@ projects use it; everyone can say exactly which release they trained on.
 (The broken-MUAC month that leads into Great Expectations is Part 10, above.)
 
 Open `metrics_by_group.json` (sensitivity at one shared threshold):
-- **Girls 0.53 vs boys 0.60.** In the simulator, MUAC reads lower for girls at
-  the same WHZ (see the notebook), mirroring field studies where MUAC and WHZ
-  disagree more for girls. → Fairlearn.
+- **Girls 0.53 vs boys 0.60.** Boys developed GAM slightly more often in the
+  training year, and the model has learned to score girls a little lower. → Fairlearn.
 - **Addis Ababa: only ~2% of children flagged.** One global threshold, very
   different base rates. → Fairlearn.
 

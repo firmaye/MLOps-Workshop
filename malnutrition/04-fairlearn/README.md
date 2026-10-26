@@ -1,8 +1,8 @@
 # 04 – Fairlearn: who does the model miss?
 
 **Where we are.** Every lesson so far showed the same number: the model catches fewer
-malnourished girls than boys. This lesson measures that properly, finds the cause, and
-compares fixes. One notebook: [`fairness.ipynb`](fairness.ipynb) (about 1.5 minutes to run).
+malnourished girls than boys. This lesson measures that properly, finds where it comes
+from, and asks which principle of fairness the programme should adopt. One notebook: [`fairness.ipynb`](fairness.ipynb) (about 1.5 minutes to run).
 
 **The setting.** A clinic can follow up 20% of visits; the model ranks children by risk
 and the top 20% are flagged. The costly error is a **miss** (a child who becomes acutely
@@ -22,17 +22,18 @@ MLflow lesson's helper module (`../03-mlflow/emr_model.py`) and generates its ow
 
 | Section | Finding |
 |---|---|
-| 1. `MetricFrame` by sex | Girls and boys develop GAM at the same rate (~11%), but sensitivity is **0.54 vs 0.61**: about 7 more of every 100 malnourished girls are missed. Flags are equally reliable (PPV ~0.32). |
+| 1. `MetricFrame` by sex | In 2025 girls and boys develop GAM at about the same rate (~11%), but sensitivity is **0.54 vs 0.61**: about 7 more of every 100 malnourished girls are missed. Flags are equally reliable (PPV ~0.32). |
 | 2. Which "fair"? | Definitions compared (demographic parity, equal opportunity, equalized odds, predictive parity). With different base rates they conflict. By region, alert rates *should* differ, but sensitivity ranges from **0.15 in Addis Ababa to 0.80 in Afar**. |
 | 3. Intersections + uncertainty | Bootstrap intervals (`n_boot`). On 2 months, the youngest children show girls 0.22 vs boys 0.74, from 23 cases each: mostly noise. On 12 months the real gap is at **6–23 months** (0.59 vs 0.68). |
-| 4. Why girls are missed | At the same MUAC, girls develop GAM *less* often (their MUAC reads lower at the same nutrition). The model learns "girl = lower risk" through `sex`, ranking malnourished girls lower. Dropping `sex` **halves the gap** (0.071 → 0.036) at no cost in ROC-AUC. |
-| 5. Mitigation | **Per-sex thresholds** within the 20% capacity: equal sensitivity (0.58 / 0.58), overall no worse. Fairlearn's `ThresholdOptimizer` with defaults flags **33%** of visits, because its objective ignores capacity. |
+| 4. Why fewer girls are flagged | In the 2024 training data boys developed GAM a little more often (11.3% vs 10.7%), as in surveys. The model learns "girl = lower risk" through `sex`; in 2025 the rates are almost equal (11.1% vs 10.9%). Dropping `sex` **halves the gap** (0.071 → 0.036) at no cost in ROC-AUC. **PAUSE: which principle would you adopt** (leave it, equal opportunity, demographic parity)? |
+| 5. If we choose equal opportunity | **Per-sex thresholds** within the 20% capacity: equal sensitivity (0.58 / 0.58), overall no worse, but a flag for a girl is less reliable (PPV 0.31 vs 0.34). Fairlearn's `ThresholdOptimizer` with defaults flags **33%** of visits, because its objective ignores capacity. |
 | 6. Decide, document, monitor | Trade-off table; write down the definition and tolerance first; gate promotion on it (MLflow lesson); monitor it (Evidently). |
 
 ## Key messages for the room
 
-- **Unfairness usually enters through the data, not the code.** Here a measurement
-  (MUAC) means different things for girls and boys, and the model inherits that.
+- **Unfairness usually enters through the data, not the code.** Here a small historical
+  difference between girls and boys becomes a lower score for every girl, and the model
+  repeats it.
 - **Choose the fairness definition with the programme owners**, before looking at models.
   For screening, equal opportunity (equal sensitivity) is the usual priority.
 - **Small groups produce noisy gaps.** Always report intervals and case counts.
@@ -54,9 +55,17 @@ MLflow lesson's helper module (`../03-mlflow/emr_model.py`) and generates its ow
 
 The model already adjusts for sex (the `sex_F` coefficient). Interactions and boosted trees (the notebook
 runs both) leave a gap of 0.07 → 0.07 / 0.05, against 0.04 without the sex feature. The model is not too simple:
-the label is partly defined by MUAC, which reads lower in girls at the same nutrition, and the record has no way
-to tell a malnourished girl from a normally thin-armed one. The fixes are decisions (threshold, features,
-review), not model capacity.
+the gap comes from the history in the data, and a flexible model learns it just as well. No model can tell
+whether a historical difference is real need or an artefact of how records were made. The fixes are decisions
+(principle, threshold, features, review), not model capacity.
+
+## Is the girls-boys difference real?
+
+The direction follows the literature (boys are more often wasted than girls: Thurstans et al., *BMJ Global Health*
+2020, pooled OR 1.26; Ethiopian DHS 2000–2016, 11.9% of boys vs 9.9% of girls). The size here is synthetic and
+smaller. The sensitivity gap itself is sample-dependent: on this workshop's 24,000 evaluation visits the 90% interval
+for the gap is roughly 0.04 to 0.10, and a different training sample would give a different size. Report it
+with an interval, as section 3 shows.
 
 ## Fairlearn cheat sheet
 
