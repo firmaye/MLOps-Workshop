@@ -1,6 +1,11 @@
 outs:
+<<<<<<< HEAD
 - md5: 631a1c0c4d385c3c8bc3a0029d4461f8.dir
   size: 1358151
+=======
+- md5: 1d72721a38d0ab9f98abf9a425b2921d.dir
+  size: 1346145
+>>>>>>> 2736481d67ecbb0d78ee16731d6ce82cedb1fc4d
   nfiles: 6
   hash: md5
   path: raw
